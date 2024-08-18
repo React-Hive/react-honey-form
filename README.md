@@ -1,11 +1,11 @@
 # React Honey Form
 
-[![Latest version](https://img.shields.io/npm/v/@tynik/react-honey-form)](https://www.npmjs.com/package/@tynik/react-honey-form)
-[![Publish status](https://github.com/Tynik/react-honey-form/actions/workflows/publish.yml/badge.svg)](https://github.com/Tynik/react-honey-form/actions/workflows/publish.yml)
-[![Package size](https://img.shields.io/bundlephobia/minzip/@tynik/react-honey-form)](https://www.npmjs.com/package/@tynik/react-honey-form)
-[![Downloads statistic](https://img.shields.io/npm/dm/@tynik/react-honey-form)](https://www.npmjs.com/package/@tynik/react-honey-form)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/tynik/react-honey-form)](https://www.npmjs.com/package/@tynik/react-honey-form)
-[![Licence](https://img.shields.io/npm/l/@tynik/react-honey-form)](https://www.npmjs.com/package/@tynik/react-honey-form)
+[![Latest version](https://img.shields.io/npm/v/@react-hive/honey-form)](https://www.npmjs.com/package/@react-hive/honey-form)
+[![Publish status](https://github.com/React-Hive/honey-form/actions/workflows/publish.yml/badge.svg)](https://github.com/React-Hive/honey-form/actions/workflows/publish.yml)
+[![Package size](https://img.shields.io/bundlephobia/minzip/@react-hive/honey-form)](https://www.npmjs.com/package/@react-hive/honey-form)
+[![Downloads statistic](https://img.shields.io/npm/dm/@react-hive/honey-form)](https://www.npmjs.com/package/@react-hive/honey-form)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/React-Hive/honey-form)](https://www.npmjs.com/package/@react-hive/honey-form)
+[![Licence](https://img.shields.io/npm/l/@react-hive/honey-form)](https://www.npmjs.com/package/@react-hive/honey-form)
 
 <p align="center">
   <img width="200" src="HoneyFormLogo.png" alt="Logo">
@@ -122,7 +122,7 @@ The `useHoneyForm` hook returns an object with the following properties:
 
 ```typescript jsx
 import React from 'react';
-import { useHoneyForm } from 'react-honey-form';
+import { useHoneyForm } from 'React-Hive/honey-form';
 
 // Define the form fields structure
 type ProfileForm = {
@@ -162,7 +162,7 @@ const Form = () => {
 
 ```typescript jsx
 import React from 'react';
-import { HoneyForm } from 'react-honey-form';
+import { HoneyForm } from '@react-hive/honey-form';
 
 // Define the form fields structure
 type ProfileForm = {
@@ -207,4 +207,4 @@ const Form = () => {
 
 ## Conclusion
 
-The `react-honey-form` is a powerful and customizable library for creating and managing forms in React. With its comprehensive set of components and hooks, you can effortlessly create forms that seamlessly blend with your application's design and behavior. The library provides convenient features for handling form submission and validation, simplifying the development process. Whether you're building simple or complex forms, `react-honey-form` empowers you to create delightful user experiences with ease.
+The `@react-hive/honey-form` is a powerful and customizable library for creating and managing forms in React. With its comprehensive set of components and hooks, you can effortlessly create forms that seamlessly blend with your application's design and behavior. The library provides convenient features for handling form submission and validation, simplifying the development process. Whether you're building simple or complex forms, `react-honey-form` empowers you to create delightful user experiences with ease.
