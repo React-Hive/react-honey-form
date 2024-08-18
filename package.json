@@ -1,19 +1,19 @@
 {
-  "name": "@tynik/react-honey-form",
-  "version": "20.20.0",
+  "name": "@react-hive/honey-form",
+  "version": "1.0.0",
   "description": "The TS library to build the fully customized forms using React framework",
   "keywords": [
     "react",
     "form",
     "typescript"
   ],
-  "homepage": "https://github.com/Tynik/react-honey-form",
+  "homepage": "https://github.com/React-Hive/honey-form",
   "bugs": {
-    "url": "https://github.com/Tynik/react-honey-form/issues"
+    "url": "https://github.com/React-Hive/honey-form/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/Tynik/react-honey-form.git"
+    "url": "git+ssh://git@github.com/React-Hive/honey-form.git"
   },
   "author": "Mykhailo Aliinyk <m.aliynik@gmail.com>",
   "license": "MIT",
