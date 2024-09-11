@@ -110,6 +110,7 @@ export type HoneyFormApi<Form extends HoneyFormBaseForm, FormContext = undefined
    * - `isFormDefaultsFetching` is `false`
    * - `isFormDefaultsFetchingErred` is `false`
    * - `isAnyFormFieldValidating` is `false`
+   * - `isFormValidating` is `false`
    * - `isFormSubmitting` is `false`
    *
    * @default true

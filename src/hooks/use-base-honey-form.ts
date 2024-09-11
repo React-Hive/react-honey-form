@@ -685,8 +685,7 @@ export const useBaseHoneyForm = <
               ),
             );
           } else if (resetAfterSubmit) {
-            resetForm();
-            return;
+            return resetForm();
           }
 
           isFormDirtyRef.current = false;
@@ -753,6 +752,7 @@ export const useBaseHoneyForm = <
     !isFormDefaultsFetching &&
     !isFormDefaultsFetchingErred &&
     !isAnyFormFieldValidating &&
+    !formState.isValidating &&
     !formState.isSubmitting;
 
   return {
