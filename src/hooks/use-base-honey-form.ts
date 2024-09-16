@@ -81,6 +81,7 @@ export const useBaseHoneyForm = <
   alwaysValidateParentField = false,
   storage,
   context: formContext,
+  onAfterValidate,
   onSubmit,
   onChange,
   onChangeDebounce = 0,
@@ -506,10 +507,29 @@ export const useBaseHoneyForm = <
   }, []);
 
   /**
-   * Validates the form fields based on the specified field names.
+   * Validates the form fields based on the specified target or excluded field names.
    *
-   * @param {Array<keyof Form>?} fieldNames - Optional array of field names to validate. If provided, only these fields will be validated.
-   * @returns {Promise<boolean>} - A promise that resolves to `true` if there are no validation errors, otherwise `false`.
+   * This function performs asynchronous validation for the form fields, either targeting
+   * specific fields for validation (`targetFields`) or excluding certain fields (`excludeFields`).
+   * If neither option is provided, all fields in the form will be validated. It handles validation
+   * for both the current form and any child forms.
+   *
+   * The function skips validation for fields that should not be validated based on the provided
+   * parameters, skippable conditions, or form context (e.g., hidden or disabled fields).
+   *
+   * @param {HoneyFormValidateOptions<Form>} [options] - Optional object containing validation options:
+   * - `targetFields`: An array of field names to validate. If provided, only these fields will be validated.
+   * - `excludeFields`: An array of field names to exclude from validation. If provided, these fields will be skipped.
+   *
+   * @returns {Promise<boolean>} - A promise that resolves to `true` if all validations pass (i.e., no errors),
+   * and `false` if any validation errors are found.
+   *
+   * @throws {Error} - Throws an error if `formFieldsRef` is empty or undefined, indicating missing form field references.
+   *
+   * @remarks
+   * - The function checks for validation errors in child forms as well. If any child forms have errors, validation fails.
+   * - Fields marked to be skipped via `excludeFields` or skippable based on the form's context or specific logic will not be validated.
+   * - Validation errors labeled as `server` errors will not prevent the form from being considered valid.
    */
   const validateForm = useCallback<HoneyFormValidate<Form>>(
     async ({ targetFields, excludeFields } = {}) => {
@@ -579,16 +599,32 @@ export const useBaseHoneyForm = <
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       setFormFields(nextFormFields);
 
+      onAfterValidate?.({
+        formContext,
+        formFields: nextFormFields,
+      });
+
       return !hasErrors;
     },
     [formContext],
   );
 
   /**
-   * Validates the form fields, updating the form state to indicate validation status.
+   * Validates the form fields, updating the form state to reflect validation progress and status.
    *
-   * @param {Array<keyof Form>?} fieldNames - Optional array of field names to validate. If provided, only these fields will be validated.
-   * @returns {Promise<boolean>} - A promise that resolves to `true` if there are no validation errors, otherwise `false`.
+   * This function provides an outer wrapper around the internal `validateForm` function, adding
+   * state management to signal when validation is in progress (`isValidating`). It helps manage
+   * the UI state during validation, ensuring that the form reflects whether it is currently being validated.
+   *
+   * @param {HoneyFormValidateOptions<Form>} [validateOptions] - Optional object specifying fields to validate or exclude:
+   * - `targetFields`: An array of field names to validate. If provided, only these fields will be validated.
+   * - `excludeFields`: An array of field names to exclude from validation. If provided, these fields will be skipped.
+   *
+   * @returns {Promise<boolean>} - A promise that resolves to `true` if all validations pass (i.e., no errors), or `false` if any validation errors are found.
+   *
+   * @remarks
+   * - The form's state is updated to indicate when validation starts (`isValidating: true`) and when it completes (`isValidating: false`).
+   * - This function ensures that validation status is reflected in the form state, allowing for better UI feedback during the process.
    */
   const outerValidateForm = useCallback<HoneyFormValidate<Form>>(
     async validateOptions => {
@@ -600,7 +636,7 @@ export const useBaseHoneyForm = <
 
         return await validateForm(validateOptions);
       } finally {
-        // Update the form state to indicate that validation is complete
+        // Ensure the form state is updated to reflect that validation is complete, regardless of the result
         updateFormState({
           isValidating: false,
         });
@@ -660,19 +696,17 @@ export const useBaseHoneyForm = <
           isValidating: true,
         });
 
-        if (await validateForm()) {
+        const isFormValid = await validateForm();
+        if (isFormValid) {
           // Only submitting the form can clear the dirty state
           updateFormState({
             isValidating: false,
             isSubmitting: true,
           });
 
-          // Prepare data for submission
           const submitData = getSubmitFormValues(parentField, formContext, formFieldsRef.current);
-
-          // Choose form submit handler
           const submitHandler = formSubmitHandler || onSubmit;
-          // Call the `submitHandler` or `onSubmit` function for actual submission
+
           const serverErrors = await submitHandler(submitData, { formContext });
 
           if (serverErrors && Object.keys(serverErrors).length) {

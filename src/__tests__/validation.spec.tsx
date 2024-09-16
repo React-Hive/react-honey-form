@@ -457,6 +457,27 @@ describe('Hook [use-honey-form]: Validation', () => {
 
     expect(onSubmit).not.toHaveBeenCalled();
   });
+
+  it('should call `onAfterValidate` when validation is complete', async () => {
+    const onAfterValidate = jest.fn();
+
+    const { result } = renderHook(() =>
+      useHoneyForm<{ name: string }>({
+        fields: {
+          name: {
+            type: 'string',
+            required: true,
+          },
+        },
+        onAfterValidate,
+        onSubmit: jest.fn(),
+      }),
+    );
+
+    await act(() => result.current.submitForm());
+
+    expect(onAfterValidate).toHaveBeenCalled();
+  });
 });
 
 describe('Hook [use-honey-form]: Direct form fields validation', () => {
@@ -745,7 +766,7 @@ describe('Hook [use-honey-form]: Validator as the promise function', () => {
 });
 
 describe('Hook [use-honey-form]: Scheduled fields validation', () => {
-  it('schedule validation for another field inside field validator', () => {
+  it('should schedule validation for another field inside field validator', () => {
     const { result } = renderHook(() =>
       useHoneyForm<{ amountFrom: number; amountTo: number }>({
         fields: {
@@ -899,9 +920,7 @@ describe('Hook [use-honey-form]: Predefined validators', () => {
     expect(result.current.formErrors).toStrictEqual({});
 
     // Set invalid from date (< min date)
-    act(() => {
-      result.current.formFields.fromDate.setValue(new Date('04/04/2031'));
-    });
+    act(() => result.current.formFields.fromDate.setValue(new Date('04/04/2031')));
 
     expect(result.current.formErrors).toStrictEqual({
       fromDate: [

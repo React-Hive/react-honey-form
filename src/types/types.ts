@@ -1312,10 +1312,83 @@ export type HoneyFormDefaults<Form extends HoneyFormBaseForm> =
   | HoneyFormDefaultValues<Form>
   | (() => Promise<HoneyFormDefaultValues<Form>>);
 
+/**
+ * Context object passed to the `onAfterValidate` callback function.
+ *
+ * This type defines the context that is provided to the `onAfterValidate` callback after the
+ * form fields have been validated, allowing access to the validated form fields and context.
+ *
+ * @template Form - Type representing the entire form.
+ * @template FormContext - The type of the context object specific to the form's submission process.
+ */
+type HoneyFormAfterValidateContext<Form extends HoneyFormBaseForm, FormContext> = {
+  /**
+   * The form fields after validation, containing the current state of each field and any validation errors.
+   */
+  formFields: HoneyFormFields<Form, FormContext>;
+  /**
+   * The form context object containing additional information or settings related to the form.
+   */
+  formContext: FormContext;
+};
+
+/**
+ * The callback function triggered after the form fields are validated.
+ *
+ * This type represents a function called once the form validation is complete. It receives
+ * the context object containing the validated form fields and form context. This callback can be used
+ * to perform additional actions or processing after validation.
+ *
+ * @template Form - Type representing the entire form.
+ * @template FormContext - The type of the context object specific to the form's submission process.
+ *
+ * @param {HoneyFormAfterValidateContext<Form, FormContext>} context - The context object containing
+ * the validated form fields and form context.
+ *
+ * @returns {void} - The function does not return any value.
+ *
+ * @remarks
+ * - This function is intended for post-validation actions, such as updating the UI or triggering
+ *   additional logic that depends on the results of validation.
+ * - It is called regardless of whether validation succeeds or fails.
+ */
+export type HoneyFormOnAfterValidate<Form extends HoneyFormBaseForm, FormContext = undefined> = (
+  context: HoneyFormAfterValidateContext<Form, FormContext>,
+) => void;
+
+/**
+ * Context object passed to the form submission handler.
+ *
+ * This type defines the context that is provided to the `onSubmit` callback function, allowing
+ * access to additional contextual information relevant to the form submission.
+ *
+ * @template FormContext - The type of the context object specific to the form's submission process.
+ */
 type HoneyFormOnSubmitContext<FormContext> = {
   formContext: FormContext;
 };
 
+/**
+ * Form submission callback function.
+ *
+ * It represents a function called when the form is submitted. It receives
+ * the form data and context as arguments, and returns a promise that resolves to either
+ * server validation errors or void (if the submission is successful without errors).
+ *
+ * @template Form - Type representing the entire form.
+ * @template FormContext - The type of the context object specific to the form's submission process.
+ *
+ * @param {Form} data - The form data to be submitted. Contains all the field values of the form.
+ * @param {HoneyFormOnSubmitContext<FormContext>} context - The context object containing additional information for the submission.
+ *
+ * @returns {Promise<HoneyFormServerErrors<Form> | void>} - A promise that resolves to:
+ * - `HoneyFormServerErrors<Form>` if there are server-side validation errors, or
+ * - `void` if the submission is successful and no errors are encountered.
+ *
+ * @remarks
+ * - The function is intended to handle the final form submission, including server-side validation and processing.
+ * - The context parameter allows passing additional metadata or configuration that might be necessary for processing the submission.
+ */
 export type HoneyFormOnSubmit<Form extends HoneyFormBaseForm, FormContext = undefined> = (
   data: Form,
   context: HoneyFormOnSubmitContext<FormContext>,
@@ -1411,7 +1484,7 @@ export type FormOptions<
    */
   values?: Partial<Form>;
   /**
-   * Determines whether the form should be reset to its initial state after a successful submit.
+   * Determines whether the form should be reset to its initial state after a successful submitting.
    * The form will be reset only when the `onSubmit` callback does not return any errors.
    *
    * @default false
@@ -1439,7 +1512,7 @@ export type FormOptions<
    */
   alwaysValidateParentField?: boolean;
   /**
-   * Where to store the fields values when they changed and restore the values from storage.
+   * Where to store the field values when they changed and restore the values from storage.
    *
    * @default undefined
    */
@@ -1453,7 +1526,44 @@ export type FormOptions<
    */
   context?: FormContext;
   /**
+   * A callback function triggered after form validation is complete.
+   *
+   * This function is called with the context object containing validated form fields and form context.
+   * It can be used for additional actions or processing after validation.
+   *
+   * @param {HoneyFormAfterValidateContext<Form, FormContext>} context - The context object containing
+   * the validated form fields and form context.
+   *
+   * @returns {void} - This function does not return any value.
+   */
+  onAfterValidate?: HoneyFormOnAfterValidate<Form, FormContext>;
+  /**
    * A callback function triggered when the form is submitted.
+   *
+   * This function is responsible for handling form submission logic, API calls,
+   * and any other actions needed when the user submits the form.
+   *
+   * The `onSubmit` callback receives the current form values and context, and it should return
+   * a result indicating success or failure of the submission.
+   *
+   * If the submission is successful and no errors are returned, the form may reset itself
+   * to the initial state, if the `resetAfterSubmit` option is set to `true`.
+   *
+   * @remarks
+   * - Ensure that the `onSubmit` function resolves any asynchronous actions (e.g., API requests)
+   *   before returning.
+   * - Return any validation errors or failure messages as necessary.
+   * - This function will not be triggered if the form has unresolved validation errors
+   *   or if the form is not in a valid state.
+   *
+   * @param formValues - The current state of form fields, which can be used to extract the submitted data.
+   * @param context - The optional form context, useful for accessing additional data or resources
+   *                  within the `onSubmit` function.
+   *
+   * @returns A result that can either be:
+   * - `{}` or `void` to indicate a successful submission with no errors.
+   * - A promise resolving to an object containing error messages mapped to the form fields,
+   *   if the submission fails or validation issues occur.
    */
   onSubmit?: HoneyFormOnSubmit<Form, FormContext>;
   /**
@@ -1628,17 +1738,27 @@ export type HoneyFormRemoveFormField<Form extends HoneyFormBaseForm> = <
 export type HoneyFormClearErrors = () => void;
 
 /**
- * Options for form validating
+ * Options for validating specific form fields.
+ *
+ * These options allow you to either target specific fields for validation or exclude certain fields
+ * from the validation process. This is useful for partial validation of large forms or when certain fields
+ * should not be validated under specific conditions.
+ *
+ * @template Form - The shape of the form, extending from the base form type.
  */
 type HoneyFormValidateOptions<Form extends HoneyFormBaseForm> = {
   /**
-   * The names of the fields to be targeted for validation.
-   * If provided, only these fields will be validated.
+   * An optional array of field names to target for validation.
+   * If specified, only the fields listed here will be validated.
+   *
+   * @default undefined - If no target fields are provided, all form fields will be validated.
    */
   targetFields?: (keyof Form)[];
   /**
-   * The names of the fields to be excluded from validation.
-   * If provided, these fields will be skipped during validation.
+   * An optional array of field names to exclude from validation.
+   * If specified, these fields will be skipped during the validation process.
+   *
+   * @default undefined - If no exclude fields are provided, no fields will be skipped during validation.
    */
   excludeFields?: (keyof Form)[];
 };
@@ -1646,9 +1766,15 @@ type HoneyFormValidateOptions<Form extends HoneyFormBaseForm> = {
 /**
  * Represents a function to validate a form.
  *
- * @param {string[]} [fieldNames] - Optional list of field names for validation.
+ * This function validates the fields of the form based on the provided options, such as
+ * targeting specific fields or excluding others. The function returns a promise that resolves to `true`
+ * if the form passes validation (i.e., no errors), or `false` if validation fails (i.e., errors are found).
  *
- * @returns {Promise<boolean>} - A Promise that resolves to `true` if the form passes validation, or `false` otherwise.
+ * @template Form - The shape of the form, extending from the base form type.
+ *
+ * @param {HoneyFormValidateOptions<Form>} [options] - Optional validation options, allowing targeting or excluding specific fields.
+ *
+ * @returns {Promise<boolean>} - A Promise that resolves to `true` if the form is valid, or `false` if validation errors are found.
  */
 export type HoneyFormValidate<Form extends HoneyFormBaseForm> = (
   options?: HoneyFormValidateOptions<Form>,

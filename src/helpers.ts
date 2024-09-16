@@ -83,7 +83,7 @@ export const mapFieldsConfigs = <Form extends HoneyFormBaseForm, FormContext>(
 /**
  * Maps server errors to a new format using a callback for each field with server errors.
  *
- * @template Form - The form type.
+ * @template Form - The type representing the form structure.
  *
  * @param {HoneyFormServerErrors<Form>} serverErrors - The server errors associated with form fields.
  * @param {(erredFieldName: keyof Form, fieldErrors: HoneyFormFieldErrorMessage[]) => HoneyFormFieldError[]} callback
