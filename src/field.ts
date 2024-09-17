@@ -76,8 +76,8 @@ const DEFAULT_FIELD_VALUE_CONVERTORS_MAP: Partial<
  * Gets the base HTML attributes for a form field.
  *
  * @template Form - Type representing the entire form.
- * @template FieldName - Name of the field in the form.
- * @template FormContext - Contextual information for the form.
+ * @template FieldName - The name of the field within the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {FieldName} fieldName - The name of the field.
  * @param {RefObject<HTMLElement>} formFieldRef - Reference to the form field element.
@@ -118,8 +118,8 @@ const FIELD_TYPE_TO_INPUT_MODE_MAP: Partial<
  * @remarks
  * This function is useful for setting the `inputMode` attribute of HTML input elements.
  *
- * @template Form - The form type.
- * @template FieldName - The field name.
+ * @template Form - Type representing the entire form.
+ * @template FieldName - The name of the field within the form.
  *
  * @param fieldConfig - The configuration of the form field.
  *
@@ -153,8 +153,8 @@ type InteractiveFieldPropsOptions<
  * Gets the interactive field properties for a form field.
  *
  * @template Form - Type representing the entire form.
- * @template FieldName - Name of the field in the form.
- * @template FormContext - Contextual information for the form.
+ * @template FieldName - The name of the field within the form.
+ * @template FormContext - The type representing the context associated with the form.
  * @template FieldValue - Type representing the value of the field.
  *
  * @param {FieldName} fieldName - The name of the field.
@@ -218,8 +218,8 @@ type PassiveFieldPropsOptions<
  * Gets the passive field properties for a form field.
  *
  * @template Form - Type representing the entire form.
- * @template FieldName - Name of the field in the form.
- * @template FormContext - Contextual information for the form.
+ * @template FieldName - The name of the field within the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {FieldName} fieldName - The name of the field.
  * @param {PassiveFieldPropsOptions<Form, FieldName, FormContext>} options - Options for passive field properties.
@@ -282,8 +282,8 @@ type ObjectFieldPropsOptions<
  * Gets the object field properties for a form field.
  *
  * @template Form - Type representing the entire form.
- * @template FieldName - Name of the field in the form.
- * @template FormContext - Contextual information for the form.
+ * @template FieldName - The name of the field within the form.
+ * @template FormContext - The type representing the context associated with the form.
  * @template FieldValue - Type representing the value of the field.
  *
  * @param {FieldName} fieldName - The name of the field.
@@ -339,9 +339,9 @@ type FieldPropsOptions<
  * and returns the appropriate properties for that field type. It ensures the form field
  * has the necessary configuration and handlers for proper functioning within the form.
  *
- * @template Form - The type representing the entire form.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field within the form.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  * @template FieldValue - The type representing the value of the field.
  *
  * @param {FieldName} fieldName - The name of the form field.
@@ -426,9 +426,9 @@ type CreateFieldOptions<Form extends HoneyFormBaseForm, FormContext> = {
  * event handlers, and other necessary properties. It ensures the form field is properly
  * integrated within the form context and maintains its state throughout the form's lifecycle.
  *
- * @template Form - The type representing the entire form structure.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field within the form.
- * @template FormContext - The type representing any additional context for the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {FieldName} fieldName - The name of the form field to be created.
  * @param {HoneyFormFieldConfig<Form, FieldName, FormContext>} fieldConfig - The configuration for the form field.
@@ -551,9 +551,9 @@ export const createField = <
  * ensuring that the field is marked as valid by setting the `aria-invalid` attribute to `false`
  * and clearing any existing error messages. It also resets the `cleanValue` property to `undefined`.
  *
- * @template Form - The type representing the entire form structure.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field within the form.
- * @template FormContext - The type representing any additional context for the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormField<Form, FieldName, FormContext>} formField - The current state of the form field to be updated.
  *
@@ -604,9 +604,9 @@ export const getNextErrorsFreeField = <
 /**
  * Returns the next state of a form field with specified errors.
  *
- * @template Form - The type representing the entire form.
- * @template FieldName - The name of the field.
- * @template FormContext - The context of the form.
+ * @template Form - Type representing the entire form.
+ * @template FieldName - The name of the field within the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormField<Form, FieldName, FormContext>} formField - The current state of the form field.
  * @param {HoneyFormFieldError[]} fieldErrors - The errors to be set on the form field.
@@ -662,9 +662,9 @@ export const getNextErredField = <
 /**
  * Retrieves the next state of a form field after resetting its values and clearing all field errors.
  *
- * @template Form - The type representing the entire form.
- * @template FieldName - The name of the field.
- * @template FormContext - The context of the form.
+ * @template Form - Type representing the entire form.
+ * @template FieldName - The name of the field within the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormField<Form, FieldName, FormContext>} formField - The form field to reset.
  * @param {boolean} [isResetToDefault=true] - Indicates whether the field should be reset to its default value.
@@ -724,9 +724,9 @@ export const getNextResetField = <
 /**
  * Handle the result of field validation and update the field errors array accordingly.
  *
- * @template Form - The type representing the entire form.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field being validated.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormFieldError[]} fieldErrors - The array to collect validation errors for the field.
  * @param {HoneyFormFieldConfig<Form, FieldName, FormContext>} fieldConfig - Configuration for the field being validated.
@@ -765,9 +765,9 @@ const handleFieldValidationResult = <
 /**
  * Updates the form field to indicate it is currently undergoing asynchronous validation.
  *
- * @template Form - The type representing the entire form structure.
- * @template FieldName - The name of the field in the form.
- * @template FormContext - The contextual information for the form.
+ * @template Form - Type representing the entire form.
+ * @template FieldName - The name of the field within the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormField<Form, FieldName, FormContext>} formField - The form field to update.
  *
@@ -791,9 +791,9 @@ const getNextAsyncValidatingField = <
 /**
  * Updates the form field to indicate it has completed asynchronous validation.
  *
- * @template Form - The type representing the entire form structure.
- * @template FieldName - The name of the field in the form.
- * @template FormContext - The contextual information for the form.
+ * @template Form - Type representing the entire form.
+ * @template FieldName - The name of the field within the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormField<Form, FieldName, FormContext>} formField - The form field to update.
  *
@@ -817,9 +817,9 @@ export const getNextAsyncValidatedField = <
 /**
  * Get the next validated field based on validation results and field errors.
  *
- * @template Form - The type representing the entire form.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field being validated.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormFieldError[]} fieldErrors - The array of validation errors for the field.
  * @param {Nullable<HoneyFormFieldValidationResult>} validationResult - The result of the field validation.
@@ -855,12 +855,12 @@ const getNextValidatedField = <
 /**
  * Execute the validator associated with the type of specific form field.
  *
- * @template Form - The form type.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field to validate.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  * @template FieldValue - The type of the field's value.
  *
- * @param {FormContext} formContext - The context of the form.
+ * @param {FormContext} formContext - The type representing the context associated with the form.
  * @param {HoneyFormFields<Form, FormContext>} formFields - The current state of all form fields.
  * @param {HoneyFormField<Form, FieldName, FormContext>} formField - The current state of the form field.
  * @param {FieldValue | undefined} fieldValue - The current value of the form field.
@@ -927,8 +927,8 @@ const executeFieldTypeValidator = <
  * This function iterates over built-in field validators and executes them for the specified field.
  *
  * @template Form - Type representing the entire form.
- * @template FieldName - Name of the field in the form.
- * @template FormContext - Contextual information for the form.
+ * @template FieldName - The name of the field within the form.
+ * @template FormContext - The type representing the context associated with the form.
  * @template FieldValue - Type representing the value of the field.
  *
  * @param fieldValue - The current value of the field.
@@ -963,9 +963,9 @@ const executeInternalFieldValidators = <
  * to the form field based on the resolved value of the promise. If the promise is rejected, it adds an error with the
  * rejection reason.
  *
- * @template Form - The type representing the entire form.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field within the form.
- * @template FormContext - Contextual information for the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormField<Form, FieldName, FormContext>} formField - The form field being validated.
  * @param {Promise<HoneyFormFieldValidationResult>} validationResponse - The promise representing the result of the validation.
@@ -1027,9 +1027,9 @@ const sanitizeFieldValue = <
 /**
  * Options for executing the validator for a specific form field.
  *
- * @template Form - The type representing the entire form.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field to validate in the form.
- * @template FormContext - The contextual information for the form.
+ * @template FormContext - The type representing the context associated with the form.
  * @template FieldValue - The type representing the value of the field.
  */
 type ExecuteFieldValidatorOptions<
@@ -1066,9 +1066,9 @@ type ExecuteFieldValidatorOptions<
 /**
  * Executes the validator for a specific form field and returns the next state of the field.
  *
- * @template Form - The type representing the entire form.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field to validate.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  * @template FieldValue - The value of the field.
  *
  * @param {ExecuteFieldValidatorOptions<Form, FieldName, FormContext, FieldValue>} options - Options for executing the field validator.
@@ -1141,9 +1141,9 @@ export const executeFieldValidator = <
  *
  * @template ParentForm - The parent form type.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
- * @template Form - The form type.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field to validate.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  */
 type ExecuteFieldValidatorAsyncOptions<
   ParentForm extends HoneyFormBaseForm,
@@ -1165,7 +1165,7 @@ type ExecuteFieldValidatorAsyncOptions<
    */
   formFields: HoneyFormFields<Form, FormContext>;
   /**
-   * The context of the form.
+   * The type representing the context associated with the form.
    */
   formContext: FormContext;
 };
@@ -1175,9 +1175,9 @@ type ExecuteFieldValidatorAsyncOptions<
  *
  * @template ParentForm - The parent form type.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
- * @template Form - The form type.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field to validate.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {ExecuteFieldValidatorAsyncOptions<ParentForm, Form, FieldName, FormContext>} options - The options for executing the field validator.
  *
@@ -1273,7 +1273,7 @@ export const executeFieldValidatorAsync = async <
  * @template ParentForm - Type representing the parent form.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - Type representing the entire form.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  */
 type ProcessSkippableFieldsOptions<
   ParentForm extends HoneyFormBaseForm,
@@ -1290,7 +1290,7 @@ type ProcessSkippableFieldsOptions<
    */
   nextFormFields: HoneyFormFields<Form, FormContext>;
   /**
-   * The context of the form.
+   * The type representing the context associated with the form.
    */
   formContext: FormContext;
 };
@@ -1301,7 +1301,7 @@ type ProcessSkippableFieldsOptions<
  * @template ParentForm - Type representing the parent form.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - Type representing the entire form.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {ProcessSkippableFieldsOptions<ParentForm, Form, FormContext>} options - The options for processing skippable fields.
  */
@@ -1335,8 +1335,8 @@ const processSkippableFields = <
 /**
  * Reset all fields in the form, resetting their values to default value and removing errors.
  *
- * @template Form - The form type.
- * @template FormContext - The context of the form.
+ * @template Form - Type representing the entire form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormFields<Form, FormContext>} nextFormFields - The next form fields state.
  */
@@ -1352,11 +1352,11 @@ export const resetAllFields = <Form extends HoneyFormBaseForm, FormContext>(
  * Reset fields to default values that depend on the specified field,
  *  recursively resetting values to default value of nested dependencies.
  *
- * @template Form - The form type.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field to validate.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
- * @param {FormContext} formContext - The context of the form.
+ * @param {FormContext} formContext - The type representing the context associated with the form.
  * @param {HoneyFormFields<Form, FormContext>} nextFormFields - The next form fields state.
  * @param {FieldName} fieldName - The name of the field triggering the resetting.
  * @param {Nullable<FieldName>} initiatorFieldName - The name of the field that initiated the resetting (optional).
@@ -1414,9 +1414,9 @@ const resetDependentFields = <
  *
  * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The type representing the name of the parent field that contains an array of values.
- * @template Form - The type representing the entire form structure.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field in the form triggering validations.
- * @template FormContext - The contextual information for the form.
+ * @template FormContext - The type representing the context associated with the form.
  */
 type TriggerScheduledFieldsValidationsOptions<
   ParentForm extends HoneyFormBaseForm,
@@ -1438,7 +1438,7 @@ type TriggerScheduledFieldsValidationsOptions<
    */
   nextFormFields: HoneyFormFields<Form, FormContext>;
   /**
-   * The context of the form.
+   * The type representing the context associated with the form.
    */
   formContext: FormContext;
   /**
@@ -1457,7 +1457,7 @@ type TriggerScheduledFieldsValidationsOptions<
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field to trigger validations for.
- * @template FormContext - The context of the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {TriggerScheduledFieldsValidationsOptions<ParentForm, ParentFieldName, Form, FieldName, FormContext>} options - The options for triggering scheduled validations.
  */
@@ -1531,7 +1531,7 @@ const triggerScheduledFieldsValidations = <
 /**
  * Options for determining the next state of a single form field.
  *
- * @template FormContext - The form context type.
+ * @template FormContext - The type representing the context associated with the form.
  */
 type NextSingleFieldStateOptions<FormContext> = {
   formContext: FormContext;
@@ -1541,10 +1541,10 @@ type NextSingleFieldStateOptions<FormContext> = {
 /**
  * Gets the next state of a single form field based on the provided field value.
  *
- * @template Form - The form type.
- * @template FieldName - The name of the form field.
+ * @template Form - Type representing the entire form.
+ * @template FieldName - The name of the field within the form.
  * @template FieldValue - The value type of the form field.
- * @template FormContext - The form context type.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormField<Form, FieldName, FormContext>} formField - The current state of the form field.
  * @param {FieldValue} fieldValue - The new value for the form field.
@@ -1607,9 +1607,9 @@ export const getNextSingleFieldState = <
  *
  * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The type representing the name of the parent field that contains an array of values.
- * @template Form - The type representing the entire form structure.
+ * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field in the form.
- * @template FormContext - The contextual information for the form.
+ * @template FormContext - The type representing the context associated with the form.
  */
 type NextFieldsStateOptions<
   ParentForm extends HoneyFormBaseForm,
@@ -1623,7 +1623,7 @@ type NextFieldsStateOptions<
    */
   parentField: HoneyFormParentField<ParentForm, ParentFieldName> | undefined;
   /**
-   * The context of the form.
+   * The type representing the context associated with the form.
    */
   formContext: FormContext;
   /**
@@ -1655,7 +1655,7 @@ type NextFieldsStateOptions<
  * @template Form - Type representing the entire form.
  * @template FieldName - The name of the field that changed.
  * @template FieldValue - The type of the field's value.
- * @template FormContext - The context type for the form.
+ * @template FormContext - The type representing the context associated with the form.
  *
  * @param {FieldName} fieldName - The name of the field that changed.
  * @param {FieldValue | undefined} fieldValue - The new value of the changed field.

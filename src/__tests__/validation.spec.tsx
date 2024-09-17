@@ -457,8 +457,31 @@ describe('Hook [use-honey-form]: Validation', () => {
 
     expect(onSubmit).not.toHaveBeenCalled();
   });
+});
 
-  it('should call `onAfterValidate` when validation is complete', async () => {
+describe('Hook [use-honey-form]: `onAfterValidate` callback function', () => {
+  it('should invoke `onAfterValidate` callback when form validation passes without errors', async () => {
+    const onAfterValidate = jest.fn();
+
+    const { result } = renderHook(() =>
+      useHoneyForm<{ name: string }>({
+        fields: {
+          name: {
+            type: 'string',
+          },
+        },
+        onAfterValidate,
+        onSubmit: jest.fn(),
+      }),
+    );
+
+    await act(() => result.current.submitForm());
+
+    expect(result.current.formFields.name.errors).toHaveLength(0);
+    expect(onAfterValidate).toHaveBeenCalled();
+  });
+
+  it('should invoke `onAfterValidate` callback when form validation fails with errors', async () => {
     const onAfterValidate = jest.fn();
 
     const { result } = renderHook(() =>
@@ -476,6 +499,7 @@ describe('Hook [use-honey-form]: Validation', () => {
 
     await act(() => result.current.submitForm());
 
+    expect(result.current.formFields.name.errors).toHaveLength(1);
     expect(onAfterValidate).toHaveBeenCalled();
   });
 });

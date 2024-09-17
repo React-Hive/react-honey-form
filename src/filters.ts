@@ -134,7 +134,7 @@ export const createHoneyFormNumberFilter =
       ? limitedBeforeDecimal.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
       : limitedBeforeDecimal;
 
-    // Combine the parts back together with the decimal point
+    // Combine the parts back with the decimal point
     const result =
       limitedAfterDecimal === undefined
         ? integerWithCommas

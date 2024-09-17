@@ -166,7 +166,7 @@ export type HoneyFormApi<Form extends HoneyFormBaseForm, FormContext = undefined
  * Represents an API for managing multiple form instances.
  *
  * @template Form - Type representing the entire form.
- * @template FormContext - Contextual information for the form.
+ * @template FormContext - The type representing the context associated with the form.
  */
 export type MultiHoneyFormsApi<Form extends HoneyFormBaseForm, FormContext = undefined> = {
   /**

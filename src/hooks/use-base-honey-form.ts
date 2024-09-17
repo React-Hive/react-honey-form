@@ -138,7 +138,7 @@ export const useBaseHoneyForm = <
     initiatorFieldName: Nullable<keyof Form>,
     fn: () => HoneyFormFields<Form, FormContext>,
     isSkipOnChange = false,
-  ) => {
+  ): HoneyFormFields<Form, FormContext> => {
     // If `isSkipOnChange` is `true`, skip debouncing and directly return the result of the provided function.
     if (isSkipOnChange) {
       return fn();
@@ -185,6 +185,9 @@ export const useBaseHoneyForm = <
     return nextFormFields;
   };
 
+  /**
+   * @template Form - Type representing the entire form.
+   */
   const setFormValues = useCallback<HoneyFormSetFormValues<Form>>(
     (
       values,
@@ -248,6 +251,9 @@ export const useBaseHoneyForm = <
     [formContext],
   );
 
+  /**
+   * @template Form - Type representing the entire form.
+   */
   const setFormErrors = useCallback<HoneyFormSetFormErrors<Form>>(formErrors => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     setFormFields(formFields => {
@@ -274,6 +280,9 @@ export const useBaseHoneyForm = <
     });
   }, []);
 
+  /**
+   * @template Form - Type representing the entire form.
+   */
   const finishFieldAsyncValidation: HoneyFormFieldFinishAsyncValidation<Form> = fieldName => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     setFormFields(formFields => {
@@ -290,7 +299,7 @@ export const useBaseHoneyForm = <
   /**
    * Set the value of a form field and update the form state accordingly.
    *
-   * @template Form - The form type.
+   * @template Form - Type representing the entire form.
    */
   const setFieldValue: HoneyFormFieldSetInternalValue<Form> = (
     fieldName,
@@ -366,6 +375,9 @@ export const useBaseHoneyForm = <
     );
   };
 
+  /**
+   * @template Form - Type representing the entire form.
+   */
   const clearFieldErrors: HoneyFormFieldClearErrors<Form> = fieldName => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     setFormFields(formFields => {
@@ -379,11 +391,19 @@ export const useBaseHoneyForm = <
     });
   };
 
+  /**
+   * @template Form - Type representing the entire form.
+   */
   const pushFieldValue: HoneyFormFieldPushValue<Form> = (fieldName, value) => {
     // @ts-expect-error
     setFieldValue(fieldName, value, { isPushValue: true });
   };
 
+  /**
+   * Removes a value from a specific form field that holds an array of values.
+   *
+   * @template Form - Type representing the entire form.
+   */
   const removeFieldValue: HoneyFormFieldRemoveValue<Form> = (fieldName, formIndex) => {
     const formFields = formFieldsRef.current;
     if (!formFields) {
@@ -491,6 +511,16 @@ export const useBaseHoneyForm = <
     [formContext],
   );
 
+  /**
+   * Removes a form field from the current form state.
+   *
+   * This function clears the default value of the specified field and removes it
+   * from the form fields. The form's internal state and references are updated accordingly.
+   *
+   * @template Form - Type representing the entire form.
+   *
+   * @param {keyof Form} fieldName - The name of the field to be removed from the form.
+   */
   const removeFormField = useCallback<HoneyFormRemoveFormField<Form>>(fieldName => {
     // Clearing the default field value
     delete formDefaultsRef.current[fieldName];
@@ -724,6 +754,10 @@ export const useBaseHoneyForm = <
 
           isFormDirtyRef.current = false;
           isFormSubmittedRef.current = true;
+
+          if (storage === 'qs') {
+            serializeFormToQueryString(fieldsConfigs, formName, submitData);
+          }
         }
       } finally {
         updateFormState({
@@ -763,6 +797,7 @@ export const useBaseHoneyForm = <
         })
         .catch(() => {
           errorMessage('Unable to fetch or process the form default values.');
+
           setIsFormDefaultsFetchingErred(true);
         })
         .finally(() => setIsFormDefaultsFetching(false));
