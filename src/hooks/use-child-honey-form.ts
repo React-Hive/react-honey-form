@@ -4,7 +4,7 @@ import type {
   HoneyFormApi,
   HoneyFormBaseForm,
   HoneyFormParentField,
-  HoneyFormFieldsConfigs,
+  HoneyFormFieldsConfig,
   HoneyFormExtractChildForm,
   ChildHoneyFormOptions,
   InitialFormFieldsStateResolverOptions,
@@ -13,7 +13,7 @@ import type {
 import {
   getHoneyFormUniqueId,
   registerChildForm,
-  mapFieldsConfigs,
+  mapFieldsConfig,
   unregisterChildForm,
 } from '../helpers';
 
@@ -28,7 +28,7 @@ type CreateInitialFormFieldsOptions<
 > = InitialFormFieldsStateResolverOptions<ChildForm, FormContext> & {
   formIndex: number | undefined;
   parentField: HoneyFormParentField<ParentForm, ParentFieldName> | undefined;
-  fieldsConfigs: HoneyFormFieldsConfigs<ChildForm, FormContext>;
+  fieldsConfig: HoneyFormFieldsConfig<ChildForm, FormContext>;
 };
 
 const createInitialFormFields = <
@@ -40,7 +40,7 @@ const createInitialFormFields = <
   formContext,
   formIndex,
   parentField,
-  fieldsConfigs,
+  fieldsConfig,
   formFieldsRef,
   formDefaultsRef,
   setFieldValue,
@@ -50,7 +50,7 @@ const createInitialFormFields = <
   removeFieldValue,
   addFormFieldErrors,
 }: CreateInitialFormFieldsOptions<ParentForm, ParentFieldName, FormContext, ChildForm>) => {
-  const formFields = mapFieldsConfigs(fieldsConfigs, (fieldName, fieldConfig) => {
+  const formFields = mapFieldsConfig(fieldsConfig, (fieldName, fieldConfig) => {
     let childFormFieldValue: Nullable<ChildForm[keyof ChildForm] | undefined> = null;
 
     if (formIndex !== undefined && parentField) {
@@ -109,7 +109,7 @@ export const useChildHoneyForm = <
 >({
   formIndex,
   parentField,
-  fields: fieldsConfigs = {} as never,
+  fields: fieldsConfig = {} as never,
   ...options
 }: ChildHoneyFormOptions<ParentForm, ParentFieldName, FormContext>): HoneyFormApi<
   ChildForm,
@@ -122,13 +122,13 @@ export const useChildHoneyForm = <
     FormContext
   >({
     parentField,
-    fieldsConfigs,
+    fieldsConfig,
     initialFormFieldsStateResolver: config =>
       // @ts-expect-error
       createInitialFormFields({
         formIndex,
         parentField,
-        fieldsConfigs,
+        fieldsConfig,
         ...config,
       }),
     ...options,

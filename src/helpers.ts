@@ -2,14 +2,14 @@ import React from 'react';
 import type {
   JSONValue,
   KeysWithArrayValues,
-  BaseHoneyFormFieldsConfigs,
+  BaseHoneyFormFieldsConfig,
   HoneyFormId,
   HoneyFormBaseForm,
   HoneyFormFields,
   HoneyFormField,
   HoneyFormChildFormContext,
   HoneyFormParentField,
-  HoneyFormFieldsConfigs,
+  HoneyFormFieldsConfig,
   HoneyFormFieldConfig,
   HoneyFormErrors,
   HoneyFormFieldError,
@@ -58,22 +58,22 @@ export const getHoneyFormUniqueId = () => {
  * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
- * @param {HoneyFormFieldsConfigs<Form, FormContext>} fieldsConfigs - Object containing field configurations.
+ * @param {HoneyFormFieldsConfig<Form, FormContext>} fieldsConfig - Object containing field configurations.
  * @param {(fieldName: keyof Form, fieldConfig: HoneyFormFieldConfig<Form, keyof Form, FormContext>) => HoneyFormField<Form, keyof Form, FormContext>} callback - Callback function
  *   invoked for each field configuration, providing the field name and the entire field configuration.
  *
  * @returns {HoneyFormFields<Form, FormContext>} - Object containing mapped form fields.
  */
-export const mapFieldsConfigs = <Form extends HoneyFormBaseForm, FormContext>(
-  fieldsConfigs: HoneyFormFieldsConfigs<Form, FormContext>,
+export const mapFieldsConfig = <Form extends HoneyFormBaseForm, FormContext>(
+  fieldsConfig: HoneyFormFieldsConfig<Form, FormContext>,
   callback: (
     fieldName: keyof Form,
     fieldConfig: HoneyFormFieldConfig<Form, keyof Form, FormContext>,
   ) => HoneyFormField<Form, keyof Form, FormContext>,
 ): HoneyFormFields<Form, FormContext> =>
-  Object.keys(fieldsConfigs).reduce(
+  Object.keys(fieldsConfig).reduce(
     (nextFormFields, fieldName: keyof Form) => {
-      nextFormFields[fieldName] = callback(fieldName, fieldsConfigs[fieldName]);
+      nextFormFields[fieldName] = callback(fieldName, fieldsConfig[fieldName]);
 
       return nextFormFields;
     },
@@ -202,7 +202,7 @@ export const getFormValues = <Form extends HoneyFormBaseForm, FormContext>(
  *
  * @returns {fieldConfig is HoneyFormInteractiveFieldConfig<Form, FieldName, FormContext>} - A boolean indicating whether the field is interactive.
  */
-export const checkIfFieldIsInteractive = <
+export const checkIfHoneyFormFieldIsInteractive = <
   Form extends HoneyFormBaseForm,
   FieldName extends keyof Form,
   FormContext,
@@ -401,7 +401,7 @@ export const getSubmitFormValues = <
         return childFormsCleanValues as Form[keyof Form];
       }
 
-      const isFieldInteractive = checkIfFieldIsInteractive(formField.config);
+      const isFieldInteractive = checkIfHoneyFormFieldIsInteractive(formField.config);
 
       return !isFieldInteractive || formField.config.submitFormattedValue
         ? formField.value
@@ -645,12 +645,12 @@ const deserializeForm = <Form extends HoneyFormBaseForm>(
  * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
- * @param {BaseHoneyFormFieldsConfigs<Form, FormContext>} fieldsConfigs - Configuration object for the form fields, including serializer functions.
+ * @param {BaseHoneyFormFieldsConfig<Form, FormContext>} fieldsConfig - Configuration object for the form fields, including serializer functions.
  * @param {string} formName - The name to use as the key in the query string.
  * @param {Form} formData - The form data to serialize and store in the query string.
  */
 export const serializeFormToQueryString = <Form extends HoneyFormBaseForm, FormContext = undefined>(
-  fieldsConfigs: BaseHoneyFormFieldsConfigs<Form, FormContext>,
+  fieldsConfig: BaseHoneyFormFieldsConfig<Form, FormContext>,
   formName: string,
   formData: Form,
 ) => {
@@ -661,7 +661,7 @@ export const serializeFormToQueryString = <Form extends HoneyFormBaseForm, FormC
     serializeForm(
       formData,
       (fieldName, fieldValue) =>
-        fieldsConfigs[fieldName].serializer?.(fieldValue) ?? (fieldValue as JSONValue),
+        fieldsConfig[fieldName].serializer?.(fieldValue) ?? (fieldValue as JSONValue),
     ),
   );
 
@@ -675,7 +675,7 @@ export const serializeFormToQueryString = <Form extends HoneyFormBaseForm, FormC
  * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
- * @param {BaseHoneyFormFieldsConfigs<Form, FormContext>} fieldsConfigs - Configuration object for the form fields, including deserializer functions.
+ * @param {BaseHoneyFormFieldsConfig<Form, FormContext>} fieldsConfig - Configuration object for the form fields, including deserializer functions.
  * @param {string} formName - The name of the form to deserialize.
  *
  * @returns {Form | undefined} - The deserialized form object, or undefined if the form data is not found in the query string.
@@ -684,7 +684,7 @@ export const deserializeFormFromQueryString = <
   Form extends HoneyFormBaseForm,
   FormContext = undefined,
 >(
-  fieldsConfigs: BaseHoneyFormFieldsConfigs<Form, FormContext>,
+  fieldsConfig: BaseHoneyFormFieldsConfig<Form, FormContext>,
   formName: string,
 ): Form | undefined => {
   const searchParams = new URLSearchParams(window.location.search);
@@ -692,7 +692,7 @@ export const deserializeFormFromQueryString = <
 
   return rawFormData
     ? deserializeForm(rawFormData, (fieldName, rawValue) => {
-        const fieldConfig = fieldsConfigs[fieldName];
+        const fieldConfig = fieldsConfig[fieldName];
 
         return fieldConfig.deserializer?.(rawValue) ?? (rawValue as Form[typeof fieldName]);
       })

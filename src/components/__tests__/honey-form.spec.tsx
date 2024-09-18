@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 
-import type { HoneyFormFieldsConfigs } from '../../types';
+import type { HoneyFormFieldsConfig } from '../../types';
 
 import { HoneyForm } from '../honey-form';
 import { HoneyFormDynamicField } from '../honey-form-dynamic.field';
@@ -20,7 +20,7 @@ describe('Component [HoneyForm]: Basic usage', () => {
       name: string;
     };
 
-    const fields: HoneyFormFieldsConfigs<Form> = {
+    const fields: HoneyFormFieldsConfig<Form> = {
       name: {
         type: 'string',
       },
@@ -46,7 +46,7 @@ describe('Component [HoneyForm]: Basic usage', () => {
 
     const onSubmit = jest.fn<Promise<void>, [Form]>();
 
-    const fields: HoneyFormFieldsConfigs<Form> = {
+    const fields: HoneyFormFieldsConfig<Form> = {
       name: {
         type: 'string',
       },
@@ -76,7 +76,7 @@ describe('Component [HoneyForm]: Field mode usage', () => {
 
     const onSubmit = jest.fn<Promise<void>, [Form]>();
 
-    const fields: HoneyFormFieldsConfigs<Form> = {
+    const fields: HoneyFormFieldsConfig<Form> = {
       name: {
         type: 'string',
         mode: 'blur',
@@ -127,7 +127,7 @@ describe('Component [HoneyForm]: File field type', () => {
 
     const onSubmit = jest.fn<Promise<void>, [Form]>();
 
-    const fields: HoneyFormFieldsConfigs<Form> = {
+    const fields: HoneyFormFieldsConfig<Form> = {
       images: {
         required: true,
         type: 'file',

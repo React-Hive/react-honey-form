@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 
-import type { HoneyFormApi, HoneyFormFieldsConfigs } from '../../types';
+import type { HoneyFormApi, HoneyFormFieldsConfig } from '../../types';
 
 import { MultiHoneyForms, useMultiHoneyFormsProvider } from '../multi-honey-forms';
 import { HoneyForm } from '../honey-form';
@@ -64,7 +64,7 @@ describe('Component [MultiHoneyForms]: Basic usage', () => {
     const onSubmit = jest.fn<Promise<void>, [Form[]]>();
 
     const FruitForm = ({ formIndex }: { formIndex: number }) => {
-      const fields: HoneyFormFieldsConfigs<Form> = {
+      const fields: HoneyFormFieldsConfig<Form> = {
         name: {
           type: 'string',
         },

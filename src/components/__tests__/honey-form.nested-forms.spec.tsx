@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 
-import type { ChildHoneyFormFieldsConfigs, HoneyFormFieldsConfigs } from '../../types';
+import type { ChildHoneyFormFieldsConfig, HoneyFormFieldsConfig } from '../../types';
 
 import { HoneyForm } from '../honey-form';
 import { useHoneyFormProvider } from '../honey-form.provider';
@@ -41,7 +41,7 @@ describe('Component [HoneyForm]: Nested forms', () => {
       items: ItemForm[];
     };
 
-    const ITEM_FORM_FIELDS: ChildHoneyFormFieldsConfigs<ItemsForm, 'items'> = {
+    const ITEM_FORM_FIELDS: ChildHoneyFormFieldsConfig<ItemsForm, 'items'> = {
       id: {
         type: 'string',
         required: true,
@@ -84,7 +84,7 @@ describe('Component [HoneyForm]: Nested forms', () => {
       );
     };
 
-    const fields: HoneyFormFieldsConfigs<ItemsForm> = {
+    const fields: HoneyFormFieldsConfig<ItemsForm> = {
       items: {
         type: 'nestedForms',
         defaultValue: [
@@ -139,7 +139,7 @@ describe('Component [HoneyForm]: Nested forms', () => {
   });
 
   it('should submit form with correct item values after dynamic addition', async () => {
-    const ITEM_FORM_FIELDS: ChildHoneyFormFieldsConfigs<ItemsForm, 'items'> = {
+    const ITEM_FORM_FIELDS: ChildHoneyFormFieldsConfig<ItemsForm, 'items'> = {
       id: {
         type: 'string',
         required: true,
@@ -182,7 +182,7 @@ describe('Component [HoneyForm]: Nested forms', () => {
       );
     };
 
-    const fields: HoneyFormFieldsConfigs<ItemsForm> = {
+    const fields: HoneyFormFieldsConfig<ItemsForm> = {
       companyName: {
         type: 'string',
         defaultValue: 'test',
@@ -363,7 +363,7 @@ describe('Component [HoneyForm]: Nested forms', () => {
       );
     };
 
-    const fields: HoneyFormFieldsConfigs<ItemsForm> = {
+    const fields: HoneyFormFieldsConfig<ItemsForm> = {
       companyName: {
         type: 'string',
         defaultValue: 'test',
@@ -450,7 +450,7 @@ describe('Component [HoneyForm]: Nested forms', () => {
       );
     };
 
-    const fields: HoneyFormFieldsConfigs<ItemsForm> = {
+    const fields: HoneyFormFieldsConfig<ItemsForm> = {
       companyName: {
         type: 'string',
         defaultValue: 'test',

@@ -931,7 +931,9 @@ export type HoneyFormFieldMeta<
    */
   isValidationScheduled: boolean;
   /**
-   * An array of child form contexts when applicable, or `undefined` initially.
+   * An array of child form contexts when applicable.
+   *
+   * @default undefined
    */
   childForms: Form[NestedFormsFieldName] extends (infer ChildForm extends ChildHoneyFormBaseForm)[]
     ? HoneyFormChildFormContext<Form, ChildForm, NestedFormsFieldName, undefined>[] | undefined
@@ -1024,6 +1026,13 @@ type BaseHoneyFormField<
   } & T
 >;
 
+/**
+ * Represents the properties for a specific form field within a form.
+ *
+ * @template Form - The type representing the structure of the entire form.
+ * @template FieldName - The name of the field within the form.
+ * @template FieldValue - The type representing the value of the field.
+ */
 export type HoneyFormFieldProps<
   Form extends HoneyFormBaseForm,
   FieldName extends keyof Form,
@@ -1038,7 +1047,7 @@ export type HoneyFormFieldProps<
    */
   passiveProps: HoneyFormPassiveFieldProps | undefined;
   /**
-   * Properties for object fields, enabling direct handling of object values.
+   * An object containing the properties needed for object fields, which handle complex data structures.
    */
   objectProps: HoneyFormObjectFieldProps<Form, FieldName, FieldValue> | undefined;
 };
@@ -1104,7 +1113,7 @@ export type HoneyFormFields<Form extends HoneyFormBaseForm, FormContext = undefi
 /**
  * Base form fields configuration.
  */
-export type BaseHoneyFormFieldsConfigs<Form extends HoneyFormBaseForm, FormContext = undefined> = {
+export type BaseHoneyFormFieldsConfig<Form extends HoneyFormBaseForm, FormContext = undefined> = {
   [FieldName in keyof Form]: BaseHoneyFormFieldConfig<
     unknown,
     Form,
@@ -1115,9 +1124,15 @@ export type BaseHoneyFormFieldsConfigs<Form extends HoneyFormBaseForm, FormConte
 };
 
 /**
- * Form fields configuration.
+ * Configuration object for all fields in a form.
+ *
+ * This type maps each field in the form to its respective configuration object,
+ * allowing the form's behavior, validation, and other properties to be customized per field.
+ *
+ * @template Form - The type representing the structure of the entire form.
+ * @template FormContext - The type representing the context associated with the form.
  */
-export type HoneyFormFieldsConfigs<Form extends HoneyFormBaseForm, FormContext = undefined> = {
+export type HoneyFormFieldsConfig<Form extends HoneyFormBaseForm, FormContext = undefined> = {
   [FieldName in keyof Form]: HoneyFormFieldConfig<Form, FieldName, FormContext, Form[FieldName]>;
 };
 
@@ -1129,7 +1144,7 @@ export type HoneyFormFieldsConfigs<Form extends HoneyFormBaseForm, FormContext =
  * @template FormContext - The type representing the context associated with the form.
  * @template ChildForm - The type representing the child form structure.
  */
-export type ChildHoneyFormFieldsConfigs<
+export type ChildHoneyFormFieldsConfig<
   ParentForm extends HoneyFormBaseForm,
   ParentFieldName extends KeysWithArrayValues<ParentForm>,
   FormContext = undefined,
@@ -1182,11 +1197,15 @@ export type HoneyFormDefaults<Form extends HoneyFormBaseForm> =
  * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  */
-export type HoneyFormAfterValidateContext<Form extends HoneyFormBaseForm, FormContext> = {
+type HoneyFormAfterValidateContext<Form extends HoneyFormBaseForm, FormContext> = {
   /**
    * The form fields after validation, containing the current state of each field and any validation errors.
    */
   formFields: HoneyFormFields<Form, FormContext>;
+  /**
+   * A summary of validation errors for the entire form, organized by field.
+   */
+  formErrors: HoneyFormErrors<Form>;
   /**
    * The form context object containing additional information or settings related to the form.
    */
@@ -1321,7 +1340,7 @@ export type FormOptions<
   /**
    * Configuration for the form fields.
    */
-  fields: BaseHoneyFormFieldsConfigs<Form, FormContext>;
+  fields: BaseHoneyFormFieldsConfig<Form, FormContext>;
   /**
    * The form name to use for saving and restoring not submitted form data.
    *
@@ -1448,7 +1467,7 @@ export type HoneyFormOptions<Form extends HoneyFormBaseForm, FormContext = undef
       /**
        * Configuration for the form fields.
        */
-      fields?: HoneyFormFieldsConfigs<Form, FormContext>;
+      fields?: HoneyFormFieldsConfig<Form, FormContext>;
     },
     Form,
     never,
@@ -1484,7 +1503,7 @@ export type ChildHoneyFormOptions<
       /**
        * Configuration for the form fields.
        */
-      fields?: ChildHoneyFormFieldsConfigs<ParentForm, ParentFieldName, FormContext>;
+      fields?: ChildHoneyFormFieldsConfig<ParentForm, ParentFieldName, FormContext>;
       /**
        * The index of a child form within a parent form, if applicable.
        */

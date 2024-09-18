@@ -3,7 +3,7 @@ import { useContext, useEffect } from 'react';
 import type {
   HoneyFormBaseForm,
   HoneyFormOptions,
-  HoneyFormFieldsConfigs,
+  HoneyFormFieldsConfig,
   HoneyFormApi,
   InitialFormFieldsStateResolverOptions,
 } from '../types';
@@ -11,19 +11,19 @@ import type { MultiHoneyFormsContextValue } from '../components/multi-honey-form
 
 import { createField } from '../field';
 import { useBaseHoneyForm } from './use-base-honey-form';
-import { mapFieldsConfigs, noop } from '../helpers';
+import { mapFieldsConfig, noop } from '../helpers';
 import { MultiHoneyFormsContext } from '../components/multi-honey-forms';
 
 type CreateInitialFormFieldsOptions<
   Form extends HoneyFormBaseForm,
   FormContext,
 > = InitialFormFieldsStateResolverOptions<Form, FormContext> & {
-  fieldsConfigs: HoneyFormFieldsConfigs<Form, FormContext>;
+  fieldsConfig: HoneyFormFieldsConfig<Form, FormContext>;
 };
 
 const createInitialFormFields = <Form extends HoneyFormBaseForm, FormContext>({
   formContext,
-  fieldsConfigs,
+  fieldsConfig,
   formFieldsRef,
   formDefaultsRef,
   setFieldValue,
@@ -33,7 +33,7 @@ const createInitialFormFields = <Form extends HoneyFormBaseForm, FormContext>({
   removeFieldValue,
   addFormFieldErrors,
 }: CreateInitialFormFieldsOptions<Form, FormContext>) => {
-  const formFields = mapFieldsConfigs(fieldsConfigs, (fieldName, fieldConfig) =>
+  const formFields = mapFieldsConfig(fieldsConfig, (fieldName, fieldConfig) =>
     createField(
       fieldName,
       {
@@ -58,7 +58,7 @@ const createInitialFormFields = <Form extends HoneyFormBaseForm, FormContext>({
 };
 
 export const useHoneyForm = <Form extends HoneyFormBaseForm, FormContext = undefined>({
-  fields: fieldsConfigs = {} as never,
+  fields: fieldsConfig = {} as never,
   ...options
 }: HoneyFormOptions<Form, FormContext>): HoneyFormApi<Form, FormContext> => {
   const multiFormsContext = useContext<MultiHoneyFormsContextValue<Form, FormContext> | undefined>(
@@ -66,8 +66,8 @@ export const useHoneyForm = <Form extends HoneyFormBaseForm, FormContext = undef
   );
 
   const formApi = useBaseHoneyForm<never, never, Form, FormContext>({
-    initialFormFieldsStateResolver: config => createInitialFormFields({ fieldsConfigs, ...config }),
-    fields: fieldsConfigs,
+    initialFormFieldsStateResolver: config => createInitialFormFields({ fieldsConfig, ...config }),
+    fields: fieldsConfig,
     ...options,
   });
 

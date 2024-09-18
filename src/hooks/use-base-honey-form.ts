@@ -39,7 +39,7 @@ import {
   getNextAsyncValidatedField,
 } from '../field';
 import {
-  checkIfFieldIsInteractive,
+  checkIfHoneyFormFieldIsInteractive,
   checkIfFieldIsNestedForms,
   forEachFormError,
   getFormErrors,
@@ -70,7 +70,7 @@ export const useBaseHoneyForm = <
   FormContext = undefined,
 >({
   initialFormFieldsStateResolver,
-  fields: fieldsConfigs,
+  fields: fieldsConfig,
   name: formName,
   parentField,
   defaults = FORM_DEFAULTS,
@@ -97,7 +97,7 @@ export const useBaseHoneyForm = <
     if (readDefaultsFromStorage && formName) {
       if (storage === 'qs') {
         // Defaults from storage can extend/override the defaults set via property
-        return { ...defaults, ...deserializeFormFromQueryString(fieldsConfigs, formName) };
+        return { ...defaults, ...deserializeFormFromQueryString(fieldsConfig, formName) };
       }
     }
 
@@ -153,7 +153,7 @@ export const useBaseHoneyForm = <
       if (storage === 'qs') {
         const formValues = getSubmitFormValues(parentField, formContext, nextFormFields);
 
-        serializeFormToQueryString(fieldsConfigs, formName, formValues);
+        serializeFormToQueryString(fieldsConfig, formName, formValues);
       }
     }
 
@@ -217,7 +217,7 @@ export const useBaseHoneyForm = <
               const fieldConfig = nextFormFields[fieldName].config;
 
               const filteredValue =
-                checkIfFieldIsInteractive(fieldConfig) && fieldConfig.filter
+                checkIfHoneyFormFieldIsInteractive(fieldConfig) && fieldConfig.filter
                   ? fieldConfig.filter(values[fieldName], { formContext })
                   : values[fieldName];
 
@@ -426,7 +426,7 @@ export const useBaseHoneyForm = <
 
       let filteredValue: Form[typeof fieldName];
 
-      if (checkIfFieldIsInteractive(formField.config) && formField.config.filter) {
+      if (checkIfHoneyFormFieldIsInteractive(formField.config) && formField.config.filter) {
         filteredValue = formField.config.filter(formField.rawValue, { formContext });
         //
       } else if (checkIfFieldIsNestedForms(formField.config)) {
@@ -631,6 +631,7 @@ export const useBaseHoneyForm = <
       onAfterValidate?.({
         formContext,
         formFields: nextFormFields,
+        formErrors: getFormErrors(nextFormFields),
       });
 
       return !hasErrors;
@@ -755,7 +756,7 @@ export const useBaseHoneyForm = <
           isFormSubmittedRef.current = true;
 
           if (storage === 'qs') {
-            serializeFormToQueryString(fieldsConfigs, formName, submitData);
+            serializeFormToQueryString(fieldsConfig, formName, submitData);
           }
         }
       } finally {
