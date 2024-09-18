@@ -55,7 +55,7 @@ export const getHoneyFormUniqueId = () => {
 /**
  * Maps over each field configuration and invokes the provided callback to create form fields.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormFieldsConfigs<Form, FormContext>} fieldsConfigs - Object containing field configurations.
@@ -83,7 +83,7 @@ export const mapFieldsConfigs = <Form extends HoneyFormBaseForm, FormContext>(
 /**
  * Maps server errors to a new format using a callback for each field with server errors.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  *
  * @param {HoneyFormServerErrors<Form>} serverErrors - The server errors associated with form fields.
  * @param {(erredFieldName: keyof Form, fieldErrors: HoneyFormFieldErrorMessage[]) => HoneyFormFieldError[]} callback
@@ -107,7 +107,7 @@ export const mapServerErrors = <Form extends HoneyFormBaseForm>(
 /**
  * Iterates over each form field and invokes the provided callback.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormFields<Form, FormContext>} formFields - An object containing the form fields.
@@ -129,7 +129,7 @@ export const forEachFormField = <Form extends HoneyFormBaseForm, FormContext>(
 /**
  * Iterates over each form field error and invokes the provided callback.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  *
  * @param {HoneyFormErrors<Form>} formErrors - An object containing form field errors.
  * @param {(fieldName: keyof Form, fieldErrors: HoneyFormFieldError[]) => void} callback - A callback function
@@ -194,7 +194,7 @@ export const getFormValues = <Form extends HoneyFormBaseForm, FormContext>(
 /**
  * Checks if the given form field configuration is interactive.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field within the form.
  * @template FormContext - The type representing the context associated with the form.
  *
@@ -217,7 +217,7 @@ export const checkIfFieldIsInteractive = <
 /**
  * Checks if a given form field is of passive type, such as checkbox, radio, or file.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field within the form.
  * @template FormContext - The type representing the context associated with the form.
  *
@@ -237,7 +237,7 @@ export const checkIfFieldIsPassive = <
 /**
  * Checks if a given form field is of object type.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field within the form.
  * @template FormContext - The type representing the context associated with the form.
  *
@@ -257,7 +257,7 @@ export const checkIfFieldIsObject = <
 /**
  * Checks if a given form field is nested forms.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field within the form.
  * @template FormContext - The type representing the context associated with the form.
  *
@@ -279,7 +279,7 @@ export const checkIfFieldIsNestedForms = <
  *
  * @template ParentForm - Type representing the parent form.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field within the form.
  * @template FormContext - The type representing the context associated with the form.
  */
@@ -314,7 +314,7 @@ type CheckIsSkipFieldOptions<
  *
  * @template ParentForm - Type representing the parent form.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field within the form.
  * @template FormContext - The type representing the context associated with the form.
  *
@@ -341,7 +341,7 @@ export const checkIsSkipField = <
 /**
  * Schedules the validation for a specific form field.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field to validate.
  *
  * @param {HoneyFormField<Form, FieldName>} formField - The form field for which validation is to be scheduled.
@@ -360,7 +360,7 @@ export const scheduleFieldValidation = <
  *
  * @template ParentForm - Type representing the parent form.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormParentField<ParentForm, ParentFieldName>} parentField - The parent form field where the child form is associated.
@@ -421,7 +421,7 @@ export const getSubmitFormValues = <
 /**
  * Retrieves form errors for each form field.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
  * @param {HoneyFormFields<Form, FormContext>} formFields - The form fields to extract errors from.
@@ -513,7 +513,7 @@ export const unregisterChildForm = <
 /**
  * Runs validation on child forms associated with a given form field.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field within the form.
  * @template FormContext - The type representing the context associated with the form.
  *
@@ -615,7 +615,7 @@ const serializeForm = <Form extends HoneyFormBaseForm>(
 /**
  * Deserializes raw form data into a form object.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  *
  * @param {string} rawFormData - The raw form data as a string.
  * @param {HoneyFormFieldDeserializer<Form>} formFieldDeserializer - The deserializer function for the form fields.
@@ -642,7 +642,7 @@ const deserializeForm = <Form extends HoneyFormBaseForm>(
 /**
  * Serializes form data and stores it in the query string under the specified form name.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
  * @param {BaseHoneyFormFieldsConfigs<Form, FormContext>} fieldsConfigs - Configuration object for the form fields, including serializer functions.
@@ -672,7 +672,7 @@ export const serializeFormToQueryString = <Form extends HoneyFormBaseForm, FormC
 /**
  * Deserializes a form from a query string.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
  * @param {BaseHoneyFormFieldsConfigs<Form, FormContext>} fieldsConfigs - Configuration object for the form fields, including deserializer functions.

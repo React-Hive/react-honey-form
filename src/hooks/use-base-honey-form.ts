@@ -11,7 +11,7 @@ import type {
   HoneyFormState,
   HoneyFormFieldPushValue,
   HoneyFormFieldRemoveValue,
-  HoneyFormFieldSetInternalValue,
+  HoneyFormFieldSetValueInternal,
   HoneyFormFieldAddErrors,
   HoneyFormFieldFinishAsyncValidation,
   HoneyFormValidateField,
@@ -122,9 +122,8 @@ export const useBaseHoneyForm = <
   /**
    * Handles form field changes with optional debouncing.
    *
-   * This function is designed to manage updates to form fields, incorporating an optional debounce mechanism
-   * to limit the frequency of form updates. The debounce functionality is particularly useful when dealing
-   * with inputs that trigger changes frequently, like text fields.
+   * This function is designed to manage updates to form fields, incorporating an optional debounced mechanism
+   * to limit the frequency of form updates.
    *
    * @param initiatorFieldName - The name of the field that triggered the change. This is used to determine
    *                             the appropriate delay time if a custom delay setting (`changeDelay`) is provided for that field.
@@ -186,7 +185,7 @@ export const useBaseHoneyForm = <
   };
 
   /**
-   * @template Form - Type representing the entire form.
+   * @template Form - The type representing the structure of the entire form.
    */
   const setFormValues = useCallback<HoneyFormSetFormValues<Form>>(
     (
@@ -252,7 +251,7 @@ export const useBaseHoneyForm = <
   );
 
   /**
-   * @template Form - Type representing the entire form.
+   * @template Form - The type representing the structure of the entire form.
    */
   const setFormErrors = useCallback<HoneyFormSetFormErrors<Form>>(formErrors => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -281,7 +280,7 @@ export const useBaseHoneyForm = <
   }, []);
 
   /**
-   * @template Form - Type representing the entire form.
+   * @template Form - The type representing the structure of the entire form.
    */
   const finishFieldAsyncValidation: HoneyFormFieldFinishAsyncValidation<Form> = fieldName => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -299,9 +298,9 @@ export const useBaseHoneyForm = <
   /**
    * Set the value of a form field and update the form state accordingly.
    *
-   * @template Form - Type representing the entire form.
+   * @template Form - The type representing the structure of the entire form.
    */
-  const setFieldValue: HoneyFormFieldSetInternalValue<Form> = (
+  const setFieldValue: HoneyFormFieldSetValueInternal<Form> = (
     fieldName,
     fieldValue,
     { isValidate = true, isDirty = true, isFormat = true, isPushValue = false } = {},
@@ -376,7 +375,7 @@ export const useBaseHoneyForm = <
   };
 
   /**
-   * @template Form - Type representing the entire form.
+   * @template Form - The type representing the structure of the entire form.
    */
   const clearFieldErrors: HoneyFormFieldClearErrors<Form> = fieldName => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -392,7 +391,7 @@ export const useBaseHoneyForm = <
   };
 
   /**
-   * @template Form - Type representing the entire form.
+   * @template Form - The type representing the structure of the entire form.
    */
   const pushFieldValue: HoneyFormFieldPushValue<Form> = (fieldName, value) => {
     // @ts-expect-error
@@ -402,7 +401,7 @@ export const useBaseHoneyForm = <
   /**
    * Removes a value from a specific form field that holds an array of values.
    *
-   * @template Form - Type representing the entire form.
+   * @template Form - The type representing the structure of the entire form.
    */
   const removeFieldValue: HoneyFormFieldRemoveValue<Form> = (fieldName, formIndex) => {
     const formFields = formFieldsRef.current;
@@ -517,7 +516,7 @@ export const useBaseHoneyForm = <
    * This function clears the default value of the specified field and removes it
    * from the form fields. The form's internal state and references are updated accordingly.
    *
-   * @template Form - Type representing the entire form.
+   * @template Form - The type representing the structure of the entire form.
    *
    * @param {keyof Form} fieldName - The name of the field to be removed from the form.
    */

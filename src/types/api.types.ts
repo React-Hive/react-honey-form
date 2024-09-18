@@ -1,11 +1,8 @@
 import type {
   HoneyFormAddFormField,
-  HoneyFormBaseForm,
   HoneyFormClearErrors,
   HoneyFormDefaultValues,
   HoneyFormErrors,
-  HoneyFormFieldAddError,
-  HoneyFormFieldAddErrors,
   HoneyFormFields,
   HoneyFormRemoveFormField,
   HoneyFormReset,
@@ -14,8 +11,9 @@ import type {
   HoneyFormSetFormValues,
   HoneyFormSubmit,
   HoneyFormValidate,
-  HoneyFormValues,
 } from './types';
+import type { HoneyFormFieldAddError, HoneyFormFieldAddErrors } from './field.types';
+import type { HoneyFormBaseForm, HoneyFormValues } from './common.types';
 
 export type HoneyFormApi<Form extends HoneyFormBaseForm, FormContext = undefined> = {
   /**
@@ -165,7 +163,7 @@ export type HoneyFormApi<Form extends HoneyFormBaseForm, FormContext = undefined
 /**
  * Represents an API for managing multiple form instances.
  *
- * @template Form - Type representing the entire form.
+ * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  */
 export type MultiHoneyFormsApi<Form extends HoneyFormBaseForm, FormContext = undefined> = {
