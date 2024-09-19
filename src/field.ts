@@ -456,7 +456,7 @@ export const createField = <
     addFormFieldErrors,
   }: CreateFieldOptions<Form, FormContext>,
 ): HoneyFormField<Form, FieldName, FormContext> => {
-  const config: HoneyFormFieldConfig<Form, FieldName, FormContext> = {
+  const resultFieldConfig: HoneyFormFieldConfig<Form, FieldName, FormContext> = {
     required: false,
     ...(checkIfHoneyFormFieldIsInteractive(fieldConfig) && {
       // Set default config values
@@ -467,21 +467,19 @@ export const createField = <
     ...fieldConfig,
   };
 
-  const formFieldRef = createRef<HTMLElement>();
-
   // Set initial field value as the default value
-  formDefaultsRef.current[fieldName] = config.defaultValue;
+  formDefaultsRef.current[fieldName] = resultFieldConfig.defaultValue;
 
-  const isFieldInteractive = checkIfHoneyFormFieldIsInteractive(config);
+  const isFieldInteractive = checkIfHoneyFormFieldIsInteractive(resultFieldConfig);
 
   const filteredValue =
-    isFieldInteractive && config.filter
-      ? config.filter(config.defaultValue, { formContext })
-      : config.defaultValue;
+    isFieldInteractive && resultFieldConfig.filter
+      ? resultFieldConfig.filter(resultFieldConfig.defaultValue, { formContext })
+      : resultFieldConfig.defaultValue;
 
   const resultValue =
-    isFieldInteractive && config.formatter
-      ? config.formatter(filteredValue, { formContext })
+    isFieldInteractive && resultFieldConfig.formatter
+      ? resultFieldConfig.formatter(filteredValue, { formContext })
       : filteredValue;
 
   const fieldMeta: HoneyFormFieldMeta<Form, FieldName, FormContext> = {
@@ -491,17 +489,19 @@ export const createField = <
     childForms: undefined,
   };
 
+  const formFieldRef = createRef<HTMLElement>();
+
   const fieldProps = getFieldProps(fieldName, resultValue, {
     formFieldRef,
     setFieldValue,
-    fieldConfig: config,
+    fieldConfig: resultFieldConfig,
   });
 
-  const newFormField: HoneyFormField<Form, FieldName, FormContext> = {
+  return {
     ...fieldProps,
-    config,
+    config: resultFieldConfig,
     errors: [],
-    defaultValue: config.defaultValue,
+    defaultValue: resultFieldConfig.defaultValue,
     rawValue: filteredValue,
     cleanValue: filteredValue,
     value: resultValue,
@@ -533,14 +533,12 @@ export const createField = <
     validate: () => validateField(fieldName),
     focus: () => {
       if (!formFieldRef.current) {
-        throw new Error(HONEY_FORM_ERRORS.emptyFormFieldsRef);
+        throw new Error('[honey-form]: The `formFieldRef` value is null');
       }
 
       formFieldRef.current.focus();
     },
   };
-
-  return newFormField;
 };
 
 /**

@@ -632,6 +632,7 @@ export const useBaseHoneyForm = <
         formContext,
         formFields: nextFormFields,
         formErrors: getFormErrors(nextFormFields),
+        isFormErred: hasErrors,
       });
 
       return !hasErrors;

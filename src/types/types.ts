@@ -1078,7 +1078,7 @@ export type HoneyFormField<
     /**
      * A function to focus on this field.
      *
-     * Note:
+     * @remarks
      * Can only be used when `props` are destructured within a component.
      */
     focus: () => void;
@@ -1210,6 +1210,10 @@ type HoneyFormAfterValidateContext<Form extends HoneyFormBaseForm, FormContext> 
    * The form context object containing additional information or settings related to the form.
    */
   formContext: FormContext;
+  /**
+   * A boolean value that becomes `true` when the form has any error.
+   */
+  isFormErred: boolean;
 };
 
 /**
