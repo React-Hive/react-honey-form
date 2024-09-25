@@ -760,7 +760,7 @@ export type HoneyFormFieldConfig<
 /**
  * Represents the configuration for a child form field within the context of a specific parent form.
  *
- * @template ParentForm - Type representing the parent form.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template FieldName - Name of the field in the child form.
  * @template FormContext - The type representing the context associated with the form.
@@ -1092,13 +1092,13 @@ export type HoneyFormField<
 /**
  * Represents the state and functionality of a parent field.
  *
- * @template ParentForm - Type representing the entire form where the parent field resides.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - Name of the parent field in the form with array values.
  */
 export type HoneyFormParentField<
   ParentForm extends HoneyFormBaseForm,
   ParentFieldName extends KeysWithArrayValues<ParentForm> = KeysWithArrayValues<ParentForm>,
-> = HoneyFormField<ParentForm, ParentFieldName>;
+> = ParentFieldName extends undefined ? never : HoneyFormField<ParentForm, ParentFieldName>;
 
 /**
  * Represents a collection of form fields.
@@ -1291,9 +1291,24 @@ export type HoneyFormOnSubmit<Form extends HoneyFormBaseForm, FormContext = unde
 ) => Promise<HoneyFormServerErrors<Form> | void>;
 
 /**
- * The context object provided to the `HoneyFormOnChange` callback function, containing information about form field changes.
+ * The context object provided to the `HoneyFormOnChange` callback, containing detailed information
+ * about form field changes and the current state of the form.
+ *
+ * @template ParentForm - The type representing the parent form structure.
+ * @template ParentFieldName - The keys in the parent form that contain array values (used for fields like lists).
+ * @template Form - The type representing the current form structure.
+ * @template FormContext - The type representing additional context for the form fields.
  */
-type HoneyFormOnChangeContext<Form extends HoneyFormBaseForm, FormContext> = {
+type HoneyFormOnChangeContext<
+  ParentForm extends HoneyFormBaseForm,
+  ParentFieldName extends KeysWithArrayValues<ParentForm>,
+  Form extends HoneyFormBaseForm,
+  FormContext,
+> = {
+  /**
+   * A reference to a parent form field.
+   */
+  parentField: HoneyFormParentField<ParentForm, ParentFieldName>;
   /**
    * An object that contains the state of the form fields.
    *
@@ -1315,9 +1330,14 @@ type HoneyFormOnChangeContext<Form extends HoneyFormBaseForm, FormContext> = {
  * @param data - The current data of the form, including all form field values.
  * @param context - The context object providing additional information about the change, such as form field errors.
  */
-export type HoneyFormOnChange<Form extends HoneyFormBaseForm, FormContext> = (
+export type HoneyFormOnChange<
+  ParentForm extends HoneyFormBaseForm,
+  ParentFieldName extends KeysWithArrayValues<ParentForm>,
+  Form extends HoneyFormBaseForm,
+  FormContext,
+> = (
   data: Form,
-  context: HoneyFormOnChangeContext<Form, FormContext>,
+  context: HoneyFormOnChangeContext<ParentForm, ParentFieldName, Form, FormContext>,
 ) => void;
 
 export type InitialFormFieldsStateResolverOptions<Form extends HoneyFormBaseForm, FormContext> = {
@@ -1443,7 +1463,7 @@ export type FormOptions<
   /**
    * A callback function triggered whenever the value of any form field changes.
    */
-  onChange?: HoneyFormOnChange<Form, FormContext>;
+  onChange?: HoneyFormOnChange<ParentForm, ParentFieldName, Form, FormContext>;
   /**
    * The debounce time in milliseconds for the `onChange` callback.
    * This sets a delay before the callback is invoked after any form field value change.

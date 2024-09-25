@@ -1136,7 +1136,7 @@ export const executeFieldValidator = <
 /**
  * Options for executing the field validator asynchronously.
  *
- * @template ParentForm - The parent form type.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field to validate.
@@ -1170,7 +1170,7 @@ type ExecuteFieldValidatorAsyncOptions<
 /**
  * Asynchronously execute the validator for a specific form field.
  *
- * @template ParentForm - The parent form type.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field to validate.
@@ -1267,7 +1267,7 @@ export const executeFieldValidatorAsync = async <
 /**
  * Options for processing the skippable fields.
  *
- * @template ParentForm - Type representing the parent form.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
@@ -1295,7 +1295,7 @@ type ProcessSkippableFieldsOptions<
 /**
  * Checks and clears errors for fields that should be skipped based on the current field's value.
  *
- * @template ParentForm - Type representing the parent form.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
@@ -1450,7 +1450,7 @@ type TriggerScheduledFieldsValidationsOptions<
 /**
  * Triggers validations for fields that have scheduled validations.
  *
- * @template ParentForm - Type representing the parent form.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field to trigger validations for.

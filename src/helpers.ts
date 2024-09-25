@@ -277,7 +277,7 @@ export const checkIfFieldIsNestedForms = <
 /**
  * Options object for determining whether to skip a form field.
  *
- * @template ParentForm - Type representing the parent form.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field within the form.
@@ -312,7 +312,7 @@ type CheckIsSkipFieldOptions<
 /**
  * Determines whether a specific form field should be skipped based on the skip function defined in its configuration.
  *
- * @template ParentForm - Type representing the parent form.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field within the form.
@@ -358,7 +358,7 @@ export const scheduleFieldValidation = <
 /**
  * Retrieves the values of the form fields suitable for form submission.
  *
- * @template ParentForm - Type representing the parent form.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
@@ -440,7 +440,7 @@ export const getFormErrors = <Form extends HoneyFormBaseForm, FormContext>(
 /**
  * Registers a child form within a parent form field's metadata.
  *
- * @template ParentForm - Type representing the parent form.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  * @template FormContext - The type representing the context associated with the form.
  * @template ChildForm - Type representing the entire child form.
@@ -468,7 +468,7 @@ export const registerChildForm = <
 /**
  * Retrieves the index of a child form within a parent form field's list of child forms.
  *
- * @template ParentForm - Type representing the parent form.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  *
  * @param {HoneyFormParentField<ParentForm, ParentFieldName>} parentField - The parent form field containing the child forms.
@@ -488,7 +488,7 @@ export const getChildFormIndex = <
 /**
  * Unregisters a child form from a parent form field's metadata using the child form's ID.
  *
- * @template ParentForm - Type representing the parent form.
+ * @template ParentForm - The type representing the parent form structure.
  * @template ParentFieldName - The field name type for the parent form that will contain the array of child forms.
  *
  * @param {HoneyFormParentField<ParentForm, ParentFieldName>} parentField - The parent form field from which to unregister the child form.
