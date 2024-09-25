@@ -41,7 +41,7 @@ describe('Component [HoneyForm]: Nested forms', () => {
       items: ItemForm[];
     };
 
-    const ITEM_FORM_FIELDS: ChildHoneyFormFieldsConfig<ItemsForm, 'items'> = {
+    const itemFormFields: ChildHoneyFormFieldsConfig<ItemsForm, 'items'> = {
       id: {
         type: 'string',
         required: true,
@@ -66,7 +66,7 @@ describe('Component [HoneyForm]: Nested forms', () => {
         <ChildHoneyForm
           formIndex={formIndex}
           parentField={itemsFormFields.items}
-          fields={ITEM_FORM_FIELDS}
+          fields={itemFormFields}
         >
           {({ formFields }) => (
             <>
@@ -139,7 +139,7 @@ describe('Component [HoneyForm]: Nested forms', () => {
   });
 
   it('should submit form with correct item values after dynamic addition', async () => {
-    const ITEM_FORM_FIELDS: ChildHoneyFormFieldsConfig<ItemsForm, 'items'> = {
+    const itemFormFields: ChildHoneyFormFieldsConfig<ItemsForm, 'items'> = {
       id: {
         type: 'string',
         required: true,
@@ -164,7 +164,7 @@ describe('Component [HoneyForm]: Nested forms', () => {
         <ChildHoneyForm
           formIndex={formIndex}
           parentField={itemsFormFields.items}
-          fields={ITEM_FORM_FIELDS}
+          fields={itemFormFields}
         >
           {({ formFields }) => (
             <>
@@ -544,6 +544,107 @@ describe('Component [HoneyForm]: Nested forms', () => {
               id: '3',
               name: 'Apple',
               price: 30,
+            },
+          ],
+        },
+        { context: undefined },
+      ),
+    );
+  });
+
+  it('should set nested forms using parent field setValue()', async () => {
+    type ItemForm = {
+      id: string;
+      name: string;
+    };
+
+    type ItemsForm = {
+      items: ItemForm[];
+    };
+
+    const onSubmit = jest.fn<Promise<void>, [ItemsForm]>();
+
+    const ItemLineForm = ({ formIndex }: ItemFormProps) => {
+      const { formFields: itemsFormFields } = useHoneyFormProvider<ItemsForm>();
+
+      const { formFields } = useChildHoneyForm<ItemsForm, 'items', ItemForm>({
+        formIndex,
+        parentField: itemsFormFields.items,
+        fields: {
+          id: {
+            type: 'string',
+            required: true,
+          },
+          name: {
+            type: 'string',
+            required: true,
+          },
+        },
+      });
+
+      return <input data-testid={`item[${formIndex}].name`} {...formFields.name.props} />;
+    };
+
+    const fields: HoneyFormFieldsConfig<ItemsForm> = {
+      items: {
+        type: 'nestedForms',
+        defaultValue: [],
+      },
+    };
+
+    const { getByTestId, queryByTestId } = render(
+      <HoneyForm fields={fields} onSubmit={onSubmit}>
+        {({ formFields }) => (
+          <>
+            {formFields.items.value.map((itemForm, itemFormIndex) => (
+              <ItemLineForm key={itemForm.id} formIndex={itemFormIndex} />
+            ))}
+
+            <button
+              type="button"
+              data-testid="addItems"
+              onClick={() =>
+                formFields.items.setValue([
+                  {
+                    id: getNextChildFormId(),
+                    name: 'Apple',
+                  },
+                  {
+                    id: getNextChildFormId(),
+                    name: 'Banana',
+                  },
+                ])
+              }
+            >
+              Add Items
+            </button>
+
+            <button type="submit" data-testid="save">
+              Save
+            </button>
+          </>
+        )}
+      </HoneyForm>,
+    );
+
+    fireEvent.click(getByTestId('addItems'));
+
+    expect(queryByTestId('item[0].name')).not.toBeNull();
+    expect(queryByTestId('item[1].name')).not.toBeNull();
+
+    fireEvent.click(getByTestId('save'));
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        {
+          items: [
+            {
+              id: '1',
+              name: 'Apple',
+            },
+            {
+              id: '2',
+              name: 'Banana',
             },
           ],
         },
