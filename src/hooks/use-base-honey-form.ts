@@ -175,6 +175,7 @@ export const useBaseHoneyForm = <
         const formErrors = getFormErrors(nextFormFields);
 
         onChange(formValues, {
+          formContext,
           parentField,
           formFields,
           formErrors,
@@ -324,6 +325,7 @@ export const useBaseHoneyForm = <
         const formField = formFields[fieldName];
 
         const isFieldErred = formField.errors.length > 0;
+        const isRevalidate = isValidate || isFieldErred;
 
         const nextFormFields = getNextFieldsState(
           fieldName,
@@ -336,7 +338,7 @@ export const useBaseHoneyForm = <
             isFormat,
             finishFieldAsyncValidation,
             // Re-validate the field immediately if it previously had errors or if forced to validate
-            isValidate: isValidate || isFieldErred,
+            isValidate: isRevalidate,
           },
         );
 
@@ -364,6 +366,7 @@ export const useBaseHoneyForm = <
               : nextFormFields[fieldName].cleanValue;
 
             fieldConfig.onChange(cleanValue, {
+              formContext,
               formFields: nextFormFields,
             });
           }, fieldConfig.onChangeDebounce ?? 0);
@@ -498,9 +501,6 @@ export const useBaseHoneyForm = <
             pushFieldValue,
             removeFieldValue,
             addFormFieldErrors,
-            form: {
-              //
-            },
           }),
         };
 

@@ -134,7 +134,7 @@ export const useChildHoneyForm = <
     ...options,
   });
 
-  const { submitForm, validateForm } = childFormApi;
+  const { submitForm, setFormValues, validateForm } = childFormApi;
 
   useEffect(() => {
     if (parentField) {
@@ -144,6 +144,7 @@ export const useChildHoneyForm = <
         formFieldsRef,
         submitForm,
         validateForm,
+        setFormValues,
         formId: formIdRef.current,
       });
     }

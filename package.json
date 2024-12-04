@@ -1,6 +1,6 @@
 {
   "name": "@react-hive/honey-form",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "The TS library to build the fully customized forms using React framework",
   "keywords": [
     "react",
@@ -55,13 +55,13 @@
     "eslint-plugin-react-hooks": "4.6.2",
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
-    "prettier": "3.3.3",
+    "prettier": "3.4.2",
     "ts-jest": "29.2.5",
     "ts-loader": "9.5.1",
-    "typescript": "5.6.2",
-    "webpack": "5.94.0",
+    "typescript": "5.7.2",
+    "webpack": "5.97.0",
     "webpack-cli": "5.1.4",
-    "html-webpack-plugin": "5.6.0"
+    "html-webpack-plugin": "5.6.3"
   },
   "jest": {
     "preset": "ts-jest",

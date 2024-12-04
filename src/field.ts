@@ -31,7 +31,6 @@ import type {
   HoneyFormValidateField,
   HoneyFormParentField,
   KeysWithArrayValues,
-  HoneyFormMeta,
 } from './types';
 import {
   INTERACTIVE_FIELD_TYPE_VALIDATORS_MAP,
@@ -407,7 +406,6 @@ const getFieldProps = <
 };
 
 type CreateFieldOptions<Form extends HoneyFormBaseForm, FormContext> = {
-  form?: HoneyFormMeta;
   formContext: FormContext;
   formFieldsRef: HoneyFormFieldsRef<Form, FormContext>;
   formDefaultsRef: HoneyFormDefaultsRef<Form>;
@@ -444,7 +442,6 @@ export const createField = <
   fieldName: FieldName,
   fieldConfig: HoneyFormFieldConfig<Form, FieldName, FormContext>,
   {
-    form,
     formContext,
     formFieldsRef,
     formDefaultsRef,
@@ -483,7 +480,6 @@ export const createField = <
       : filteredValue;
 
   const fieldMeta: HoneyFormFieldMeta<Form, FieldName, FormContext> = {
-    form,
     formFieldsRef,
     isValidationScheduled: false,
     childForms: undefined,
@@ -875,7 +871,7 @@ const executeFieldTypeValidator = <
   formField: HoneyFormField<Form, FieldName, FormContext>,
   fieldValue: FieldValue | undefined,
 ): Nullable<HoneyFormFieldValidationResult> => {
-  if (formField.config.type === 'object' || formField.config.type === 'nestedForms') {
+  if (checkIfFieldIsObject(formField.config) || checkIfFieldIsNestedForms(formField.config)) {
     return null;
   }
 
@@ -1207,7 +1203,8 @@ export const executeFieldValidatorAsync = async <
   if (checkIfHoneyFormFieldIsInteractive(formField.config)) {
     filteredValue =
       typeof filteredValue === 'string'
-        ? ((filteredValue as string).trimStart() as Form[FieldName])
+        ? // Use trimStart() to do not allow typing from a space
+          ((filteredValue as string).trimStart() as Form[FieldName])
         : filteredValue;
 
     if (formField.config.filter) {
@@ -1232,7 +1229,6 @@ export const executeFieldValidatorAsync = async <
   if (validationResult === null || validationResult === true) {
     executeInternalFieldValidators(sanitizedValue, formField.config, fieldErrors);
 
-    // execute custom validator. Can be run only when default validator return true
     if (formField.config.validator) {
       const formValues = getFormValues(formFields);
 

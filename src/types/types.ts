@@ -89,10 +89,15 @@ export type HoneyFormErrors<Form extends HoneyFormBaseForm> = {
  *
  * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
- *
- * @property {HoneyFormFields<Form, FormContext>} formFields - The current state of all form fields.
  */
 type HoneyFormFieldOnChangeContext<Form extends HoneyFormBaseForm, FormContext> = {
+  /**
+   * The contextual information for the form.
+   */
+  formContext: FormContext;
+  /**
+   * The current state of all form fields.
+   */
   formFields: HoneyFormFields<Form, FormContext>;
 };
 
@@ -352,10 +357,11 @@ export type HoneyFormNestedFormsFieldValidator<
  * Context object for the filter function of a form field.
  *
  * @template FormContext - The type representing the context associated with the form.
- *
- * @property formContext - The contextual information for the form.
  */
 type HoneyFormFieldFilterContext<FormContext> = {
+  /**
+   * The contextual information for the form.
+   */
   formContext: FormContext;
 };
 
@@ -379,10 +385,11 @@ export type HoneyFormFieldFilter<FieldValue, FormContext = undefined> = (
  * Contextual information provided to a form field formatter function.
  *
  * @template FormContext - The type representing the context associated with the form.
- *
- * @property formContext - The context object containing information relevant to the form.
  */
 type HoneyFormFieldFormatterContext<FormContext> = {
+  /**
+   * The contextual information for the form.
+   */
   formContext: FormContext;
 };
 
@@ -899,6 +906,10 @@ export type HoneyFormChildFormContext<
    */
   formFieldsRef: HoneyFormFieldsRef<ChildForm, FormContext>;
   /**
+   * Sets the values of the form fields.
+   */
+  setFormValues: HoneyFormSetFormValues<ChildForm>;
+  /**
    * A function to submit the child form.
    */
   submitForm: HoneyFormSubmit<ChildForm, FormContext>;
@@ -906,10 +917,6 @@ export type HoneyFormChildFormContext<
    * A function to validate the child form.
    */
   validateForm: HoneyFormValidate<ChildForm>;
-};
-
-export type HoneyFormMeta = {
-  //
 };
 
 /**
@@ -921,7 +928,6 @@ export type HoneyFormFieldMeta<
   FormContext,
   NestedFormsFieldName extends KeysWithArrayValues<Form> = KeysWithArrayValues<Form>,
 > = {
-  form: HoneyFormMeta;
   /**
    * Reference to form fields.
    */
@@ -1261,6 +1267,9 @@ export type HoneyFormServerErrors<Form extends HoneyFormBaseForm> = {
  * @template FormContext - The type representing the context associated with the form.
  */
 type HoneyFormOnSubmitContext<FormContext> = {
+  /**
+   * The contextual information for the form.
+   */
   formContext: FormContext;
 };
 
@@ -1305,6 +1314,10 @@ type HoneyFormOnChangeContext<
   Form extends HoneyFormBaseForm,
   FormContext,
 > = {
+  /**
+   * The contextual information for the form.
+   */
+  formContext: FormContext;
   /**
    * A reference to a parent form field.
    */
