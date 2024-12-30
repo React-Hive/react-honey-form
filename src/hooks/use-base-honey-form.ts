@@ -784,7 +784,7 @@ export const useBaseHoneyForm = <
         isSkipOnChange: true,
       });
     }
-  }, [externalValues]);
+  }, [externalValues, validateExternalValues]);
 
   useEffect(() => {
     if (typeof defaults === 'function') {
