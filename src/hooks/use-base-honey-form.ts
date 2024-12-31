@@ -86,8 +86,6 @@ export const useBaseHoneyForm = <
   onChange,
   onChangeDebounce = 0,
 }: FormOptions<ParentForm, ParentFieldName, Form, FormContext>) => {
-  const formIdRef = useRef<Nullable<HoneyFormId>>(null);
-
   const [formState, setFormState] = useState<HoneyFormState>(INITIAL_FORM_STATE);
 
   const [isFormDefaultsFetching, setIsFormDefaultsFetching] = useState(false);
@@ -105,6 +103,10 @@ export const useBaseHoneyForm = <
   });
 
   const formDefaultsRef = useRef<HoneyFormDefaultValues<Form>>(formDefaults);
+  const formIdRef = useRef<Nullable<HoneyFormId>>(null);
+  const formContextRef = useRef<FormContext>(formContext);
+  formContextRef.current = formContext;
+
   const formFieldsRef = useRef<Nullable<HoneyFormFields<Form, FormContext>>>(null);
   const formValuesRef = useRef<Nullable<Form>>(null);
   const formErrorsRef = useRef<Nullable<HoneyFormErrors<Form>>>(null);
@@ -151,7 +153,7 @@ export const useBaseHoneyForm = <
 
     if (!parentField) {
       if (storage === 'qs') {
-        const formValues = getSubmitFormValues(parentField, formContext, nextFormFields);
+        const formValues = getSubmitFormValues(parentField, formContextRef.current, nextFormFields);
 
         serializeFormToQueryString(fieldsConfig, formName, formValues);
       }
@@ -171,14 +173,20 @@ export const useBaseHoneyForm = <
           throw new Error(HONEY_FORM_ERRORS.emptyFormFieldsRef);
         }
 
-        const formValues = getSubmitFormValues(parentField, formContext, nextFormFields);
+        const formValues = getFormValues(nextFormFields);
+        const cleanFormValues = getSubmitFormValues(
+          parentField,
+          formContextRef.current,
+          nextFormFields,
+        );
         const formErrors = getFormErrors(nextFormFields);
 
-        onChange(formValues, {
-          formContext,
+        onChange(cleanFormValues, {
           parentField,
           formFields,
+          formValues,
           formErrors,
+          formContext: formContextRef.current,
         });
       }, debounceTime);
     }
@@ -230,7 +238,7 @@ export const useBaseHoneyForm = <
                     formFields: nextFormFields,
                     fieldValue: filteredValue,
                   })
-                : nextFormFields[fieldName];
+                : getNextErrorsFreeField(nextFormFields[fieldName]);
 
               nextFormFields[fieldName] = getNextSingleFieldState(nextFormField, filteredValue, {
                 formContext,
@@ -598,9 +606,7 @@ export const useBaseHoneyForm = <
               formValues,
             })
           ) {
-            nextFormFields[fieldName] = getNextErrorsFreeField<Form, typeof fieldName, FormContext>(
-              formField,
-            );
+            nextFormFields[fieldName] = getNextErrorsFreeField(formField);
             return;
           }
 
@@ -795,7 +801,11 @@ export const useBaseHoneyForm = <
           // Returned defaults from promise function can extend/override the defaults set via property
           formDefaultsRef.current = { ...formDefaultsRef.current, ...defaultValues };
 
-          setFormValues(defaultValues, { isValidate: false, isDirty: false, isSkipOnChange: true });
+          setFormValues(defaultValues, {
+            isValidate: false,
+            isDirty: false,
+            isSkipOnChange: true,
+          });
         })
         .catch(() => {
           errorMessage('Unable to fetch or process the form default values.');

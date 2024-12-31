@@ -1708,6 +1708,8 @@ export const getNextFieldsState = <
       formFields: nextFormFields,
       fieldValue: filteredValue,
     });
+  } else {
+    nextFormField = getNextErrorsFreeField(nextFormField);
   }
 
   nextFormFields[fieldName] = getNextSingleFieldState(nextFormField, filteredValue, {

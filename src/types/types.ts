@@ -1329,6 +1329,10 @@ type HoneyFormOnChangeContext<
    */
   formFields: HoneyFormFields<Form, FormContext>;
   /**
+   * The current values of all form fields.
+   */
+  formValues: HoneyFormValues<Form>;
+  /**
    * An object that includes all field errors.
    * When a field has any error, the field appears in this object as a key, and the value is an array of field errors.
    *
