@@ -1298,7 +1298,7 @@ type ProcessSkippableFieldsOptions<
  *
  * @param {ProcessSkippableFieldsOptions<ParentForm, Form, FormContext>} options - The options for processing skippable fields.
  */
-const processSkippableFields = <
+export const processSkippableFields = <
   ParentForm extends HoneyFormBaseForm,
   ParentFieldName extends KeysWithArrayValues<ParentForm>,
   Form extends HoneyFormBaseForm,
