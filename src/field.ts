@@ -1718,6 +1718,7 @@ export const getNextFieldsState = <
   });
 
   processSkippableFields({ parentField, nextFormFields, formContext });
+
   triggerScheduledFieldsValidations({
     parentField,
     fieldName,

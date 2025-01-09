@@ -213,6 +213,7 @@ export const useBaseHoneyForm = <
           () => {
             const nextFormFields = { ...formFields };
 
+            const formValues = getFormValues(nextFormFields);
             if (isClearAll) {
               resetAllFields(nextFormFields);
             }
@@ -226,19 +227,28 @@ export const useBaseHoneyForm = <
 
               const fieldConfig = nextFormFields[fieldName].config;
 
+              const isSkipField = checkIsSkipField({
+                parentField,
+                fieldName,
+                formContext,
+                formValues,
+                formFields: nextFormFields,
+              });
+
               const filteredValue =
                 checkIfHoneyFormFieldIsInteractive(fieldConfig) && fieldConfig.filter
                   ? fieldConfig.filter(values[fieldName], { formContext })
                   : values[fieldName];
 
-              const nextFormField = isValidate
-                ? executeFieldValidator({
-                    formContext,
-                    fieldName,
-                    formFields: nextFormFields,
-                    fieldValue: filteredValue,
-                  })
-                : getNextErrorsFreeField(nextFormFields[fieldName]);
+              const nextFormField =
+                !isSkipField && isValidate
+                  ? executeFieldValidator({
+                      formContext,
+                      fieldName,
+                      formFields: nextFormFields,
+                      fieldValue: filteredValue,
+                    })
+                  : getNextErrorsFreeField(nextFormFields[fieldName]);
 
               nextFormFields[fieldName] = getNextSingleFieldState(nextFormField, filteredValue, {
                 formContext,
