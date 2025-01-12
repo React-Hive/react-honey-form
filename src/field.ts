@@ -31,6 +31,7 @@ import type {
   HoneyFormValidateField,
   HoneyFormParentField,
   KeysWithArrayValues,
+  HoneyFormValues,
 } from './types';
 import {
   INTERACTIVE_FIELD_TYPE_VALIDATORS_MAP,
@@ -98,7 +99,7 @@ const getBaseFieldProps = <
     type: FIELD_TYPE_MAP[fieldConfig.type],
     name: fieldName.toString(),
     // ARIA
-    'aria-required': fieldConfig.required,
+    'aria-required': fieldConfig.required === true,
     'aria-invalid': false,
   };
 };
@@ -913,6 +914,20 @@ const executeFieldTypeValidator = <
   return null;
 };
 
+type ExecuteInternalFieldValidatorsOptions<
+  Form extends HoneyFormBaseForm,
+  FieldName extends keyof Form,
+  FormContext,
+  FieldValue extends Form[FieldName] = Form[FieldName],
+> = {
+  fieldValue: FieldValue | undefined;
+  fieldConfig: HoneyFormFieldConfig<Form, FieldName, FormContext>;
+  fieldErrors: HoneyFormFieldError[];
+  formContext: FormContext;
+  formFields: HoneyFormFields<Form, FormContext>;
+  formValues: HoneyFormValues<Form>;
+};
+
 /**
  * Executes internal field validators for a given form field.
  *
@@ -922,24 +937,28 @@ const executeFieldTypeValidator = <
  * @template Form - The type representing the structure of the entire form.
  * @template FieldName - The name of the field within the form.
  * @template FormContext - The type representing the context associated with the form.
- * @template FieldValue - Type representing the value of the field.
- *
- * @param fieldValue - The current value of the field.
- * @param fieldConfig - Configuration options for the form field.
- * @param fieldErrors - An array of errors associated with the field.
  */
 const executeInternalFieldValidators = <
   Form extends HoneyFormBaseForm,
   FieldName extends keyof Form,
   FormContext,
-  FieldValue extends Form[FieldName],
->(
-  fieldValue: FieldValue | undefined,
-  fieldConfig: HoneyFormFieldConfig<Form, FieldName, FormContext>,
-  fieldErrors: HoneyFormFieldError[],
-) => {
+>({
+  fieldValue,
+  fieldConfig,
+  fieldErrors,
+  formContext,
+  formFields,
+  formValues,
+}: ExecuteInternalFieldValidatorsOptions<Form, FieldName, FormContext>) => {
   BUILT_IN_FIELD_VALIDATORS.forEach(validator => {
-    validator(fieldValue, fieldConfig, fieldErrors);
+    validator({
+      fieldValue,
+      fieldConfig,
+      fieldErrors,
+      formContext,
+      formFields,
+      formValues,
+    });
   });
 
   if (checkIfHoneyFormFieldIsInteractive(fieldConfig)) {
@@ -1099,12 +1118,19 @@ export const executeFieldValidator = <
 
   // Do not run additional validators if the default field type validator failed
   if (validationResult === null || validationResult === true) {
-    executeInternalFieldValidators(sanitizedValue, formField.config, fieldErrors);
+    const formValues = getFormValues(formFields);
+
+    executeInternalFieldValidators({
+      fieldValue: sanitizedValue,
+      fieldConfig: formField.config,
+      fieldErrors,
+      formContext,
+      formFields,
+      formValues,
+    });
 
     // Execute custom validator. Can only run when the default validator returns true
     if (formField.config.validator) {
-      const formValues = getFormValues(formFields);
-
       const validationResponse = formField.config.validator(sanitizedValue, {
         formContext,
         formFields,
@@ -1227,11 +1253,18 @@ export const executeFieldValidatorAsync = async <
 
   // Do not run additional validators if the default field type validator failed
   if (validationResult === null || validationResult === true) {
-    executeInternalFieldValidators(sanitizedValue, formField.config, fieldErrors);
+    const formValues = getFormValues(formFields);
+
+    executeInternalFieldValidators({
+      fieldValue: sanitizedValue,
+      fieldConfig: formField.config,
+      fieldErrors,
+      formContext,
+      formFields,
+      formValues,
+    });
 
     if (formField.config.validator) {
-      const formValues = getFormValues(formFields);
-
       const validationResponse = formField.config.validator(sanitizedValue, {
         formContext,
         formFields,

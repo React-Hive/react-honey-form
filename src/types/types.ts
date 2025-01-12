@@ -206,7 +206,12 @@ export type HoneyFormInteractiveFieldValidator<
   /**
    * The validation context, containing the field configuration and other form fields.
    */
-  context: HoneyFormInteractiveFieldValidatorContext<Form, FieldName, FormContext, FieldValue>,
+  validatorContext: HoneyFormInteractiveFieldValidatorContext<
+    Form,
+    FieldName,
+    FormContext,
+    FieldValue
+  >,
 ) => HoneyFormFieldValidationResult | Promise<HoneyFormFieldValidationResult>;
 
 /**
@@ -255,7 +260,7 @@ export type HoneyFormPassiveFieldValidator<
   /**
    * The validation context, containing the field configuration and other form fields.
    */
-  context: HoneyFormPassiveFieldValidatorContext<Form, FieldName, FormContext, FieldValue>,
+  validatorContext: HoneyFormPassiveFieldValidatorContext<Form, FieldName, FormContext, FieldValue>,
 ) => HoneyFormFieldValidationResult | Promise<HoneyFormFieldValidationResult>;
 
 /**
@@ -301,7 +306,7 @@ export type HoneyFormObjectFieldValidator<
   /**
    * Context object containing information about the form and field.
    */
-  context: HoneyFormObjectFieldValidatorContext<Form, FieldName, FormContext, FieldValue>,
+  validatorContext: HoneyFormObjectFieldValidatorContext<Form, FieldName, FormContext, FieldValue>,
 ) => HoneyFormFieldValidationResult | Promise<HoneyFormFieldValidationResult>;
 
 /**
@@ -350,7 +355,12 @@ export type HoneyFormNestedFormsFieldValidator<
   /**
    * The validation context, containing the field configuration and other form fields.
    */
-  context: HoneyFormNestedFormsFieldValidatorContext<Form, FieldName, FormContext, FieldValue>,
+  validatorContext: HoneyFormNestedFormsFieldValidatorContext<
+    Form,
+    FieldName,
+    FormContext,
+    FieldValue
+  >,
 ) => HoneyFormFieldValidationResult | Promise<HoneyFormFieldValidationResult>;
 
 /**
@@ -372,13 +382,13 @@ type HoneyFormFieldFilterContext<FormContext> = {
  * @template FormContext - The type representing the context associated with the form.
  *
  * @param value - The value to be filtered.
- * @param context - The context object containing information relevant to the form.
+ * @param filterContext - The context object containing information relevant to the form.
  *
  * @returns The filtered value, possibly transformed based on the provided context.
  */
 export type HoneyFormFieldFilter<FieldValue, FormContext = undefined> = (
   value: FieldValue | undefined,
-  context: HoneyFormFieldFilterContext<FormContext>,
+  filterContext: HoneyFormFieldFilterContext<FormContext>,
 ) => FieldValue | undefined;
 
 /**
@@ -400,13 +410,13 @@ type HoneyFormFieldFormatterContext<FormContext> = {
  * @template FormContext - The type representing the context associated with the form.
  *
  * @param value - The current value of the form field.
- * @param context - The context object providing additional information for formatting.
+ * @param formatterContext - The context object providing additional information for formatting.
  *
  * @returns The formatted value of the form field or undefined if no formatting is applied.
  */
 export type HoneyFormFieldFormatter<FieldValue, FormContext = undefined> = (
   value: FieldValue | undefined,
-  context: HoneyFormFieldFormatterContext<FormContext>,
+  formatterContext: HoneyFormFieldFormatterContext<FormContext>,
 ) => FieldValue | undefined;
 
 /**
@@ -415,11 +425,12 @@ export type HoneyFormFieldFormatter<FieldValue, FormContext = undefined> = (
  * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
- * @param context - The context object containing form context and form fields.
+ * @param executionContext - The context object containing form context and form fields.
+ *
  * @returns `true` if the field should be skipped, `false` otherwise.
  */
 type HoneyFormSkipField<Form extends HoneyFormBaseForm, FormContext> = (
-  context: BaseHoneyFormFieldExecutionContext<unknown, Form, FormContext>,
+  executionContext: BaseHoneyFormFieldExecutionContext<unknown, Form, FormContext>,
 ) => boolean;
 
 /**
@@ -434,6 +445,26 @@ type HoneyFormFieldConfigProps = Omit<
 >;
 
 /**
+ * Defines whether a form field is required.
+ *
+ * This type can be:
+ * - A `boolean`: If `true`, the field is always required.
+ * - A `function`: Determines dynamically if the field is required based on the current value
+ *   of the field and the execution context of the form.
+ *
+ * @template Form - The type representing the structure of the entire form.
+ * @template FormContext - The type representing the context associated with the form.
+ *
+ * @param {BaseHoneyFormFieldExecutionContext<unknown, Form, FormContext>} executionContext - Additional execution context,
+ *   which may include form state, validation data, or other relevant information.
+ *
+ * @returns {boolean} - If `true`, the field is considered required; otherwise, `false`.
+ */
+type HoneyFormFieldRequired<Form extends HoneyFormBaseForm, FormContext> =
+  | boolean
+  | ((executionContext: BaseHoneyFormFieldExecutionContext<unknown, Form, FormContext>) => boolean);
+
+/**
  * A function type that defines a dependency relationship between form fields.
  *
  * This function determines whether the target field depends on the value of the initiator field.
@@ -446,7 +477,7 @@ type HoneyFormFieldConfigProps = Omit<
  *
  * @param {keyof Form} initiatorFieldName - The name of the field that triggers the dependency check.
  * @param {FieldValue | undefined} value - The current value of the field being checked for dependency.
- * @param {BaseHoneyFormFieldExecutionContext<unknown, Form, FormContext>} context - Additional execution context,
+ * @param {BaseHoneyFormFieldExecutionContext<unknown, Form, FormContext>} executionContext - Additional execution context,
  *  which may include form state, validation data, or other relevant information.
  *
  * @returns {boolean} - Returns `true` if the dependency condition is met, otherwise `false`.
@@ -459,7 +490,7 @@ type HoneyFormFieldDependsOnFn<
 > = (
   initiatorFieldName: keyof Form,
   value: FieldValue | undefined,
-  context: BaseHoneyFormFieldExecutionContext<unknown, Form, FormContext>,
+  executionContext: BaseHoneyFormFieldExecutionContext<unknown, Form, FormContext>,
 ) => boolean;
 
 /**
@@ -504,9 +535,14 @@ type BaseHoneyFormFieldConfig<
     /**
      * Indicates whether the field is required.
      *
+     * This property defines if the field must have a value.
+     * - If `true`, the field is always required.
+     * - If a function, it dynamically determines if the field is required
+     *   based on the field's value and the current form execution context.
+     *
      * @default false
      */
-    required?: boolean;
+    required?: HoneyFormFieldRequired<Form, FormContext>;
     /**
      * The default value for the field.
      *
@@ -799,12 +835,16 @@ export type ChildHoneyFormFieldConfig<
 export type HoneyFormFieldBuiltInValidator = <
   Form extends HoneyFormBaseForm,
   FieldName extends keyof Form,
+  FormContext = undefined,
   FieldValue extends Form[FieldName] = Form[FieldName],
->(
-  fieldValue: FieldValue | undefined,
-  fieldConfig: HoneyFormFieldConfig<Form, FieldName, undefined, FieldValue>,
-  fieldErrors: HoneyFormFieldError[],
-) => void;
+>(context: {
+  fieldValue: FieldValue | undefined;
+  fieldConfig: HoneyFormFieldConfig<Form, FieldName, FormContext, FieldValue>;
+  fieldErrors: HoneyFormFieldError[];
+  formContext: FormContext;
+  formFields: HoneyFormFields<Form, FormContext>;
+  formValues: HoneyFormValues<Form>;
+}) => void;
 
 /**
  * Represents a built-in form field validator function specifically for interactive form fields.
@@ -1232,7 +1272,7 @@ type HoneyFormAfterValidateContext<Form extends HoneyFormBaseForm, FormContext> 
  * @template Form - The type representing the structure of the entire form.
  * @template FormContext - The type representing the context associated with the form.
  *
- * @param {HoneyFormAfterValidateContext<Form, FormContext>} context - The context object containing
+ * @param {HoneyFormAfterValidateContext<Form, FormContext>} validateContext - The context object containing
  * the validated form fields and form context.
  *
  * @returns {void} - The function does not return any value.
@@ -1243,7 +1283,7 @@ type HoneyFormAfterValidateContext<Form extends HoneyFormBaseForm, FormContext> 
  * - It is called regardless of whether validation succeeds or fails.
  */
 export type HoneyFormOnAfterValidate<Form extends HoneyFormBaseForm, FormContext = undefined> = (
-  context: HoneyFormAfterValidateContext<Form, FormContext>,
+  validateContext: HoneyFormAfterValidateContext<Form, FormContext>,
 ) => void;
 
 /**
@@ -1284,7 +1324,7 @@ type HoneyFormOnSubmitContext<FormContext> = {
  * @template FormContext - The type representing the context associated with the form.
  *
  * @param {Form} data - The form data to be submitted. Contains all the field values of the form.
- * @param {HoneyFormOnSubmitContext<FormContext>} context - The context object containing additional information for the submission.
+ * @param {HoneyFormOnSubmitContext<FormContext>} submitContext - The context object containing additional information for the submission.
  *
  * @returns {Promise<HoneyFormServerErrors<Form> | void>} - A promise that resolves to:
  * - `HoneyFormServerErrors<Form>` if there are server-side validation errors, or
@@ -1296,7 +1336,7 @@ type HoneyFormOnSubmitContext<FormContext> = {
  */
 export type HoneyFormOnSubmit<Form extends HoneyFormBaseForm, FormContext = undefined> = (
   data: Form,
-  context: HoneyFormOnSubmitContext<FormContext>,
+  submitContext: HoneyFormOnSubmitContext<FormContext>,
 ) => Promise<HoneyFormServerErrors<Form> | void>;
 
 /**
@@ -1581,11 +1621,14 @@ export type MultiHoneyFormOptions<Form extends HoneyFormBaseForm, FormContext = 
    * A callback function that will be invoked only when all forms have successfully passed validation.
    *
    * @param {Form[]} data - An array containing the data from all forms.
-   * @param {MultiHoneyFormsOnSubmitContext<FormContext>} context - The contextual information for the submission process.
+   * @param {MultiHoneyFormsOnSubmitContext<FormContext>} submitContext - The contextual information for the submission process.
    *
    * @returns {Promise<void>} - A Promise that resolves when the submission process is complete.
    */
-  onSubmit?: (data: Form[], context: MultiHoneyFormsOnSubmitContext<FormContext>) => Promise<void>;
+  onSubmit?: (
+    data: Form[],
+    submitContext: MultiHoneyFormsOnSubmitContext<FormContext>,
+  ) => Promise<void>;
 };
 
 /**

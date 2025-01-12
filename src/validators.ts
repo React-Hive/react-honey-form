@@ -88,21 +88,35 @@ export const PASSIVE_FIELD_TYPE_VALIDATORS_MAP: Record<
 /**
  * Built-in field validator for checking if a field is required.
  */
-export const requiredBuiltInFieldValidator: HoneyFormFieldBuiltInValidator = (
+export const requiredBuiltInFieldValidator: HoneyFormFieldBuiltInValidator = ({
   fieldValue,
   fieldConfig,
   fieldErrors,
-) => {
+  formContext,
+  formFields,
+  formValues,
+}) => {
   if (!fieldConfig.required) {
     return;
   }
 
-  if (
-    fieldValue === undefined ||
-    fieldValue === null ||
-    fieldValue === '' ||
-    (Array.isArray(fieldValue) && !fieldValue.length)
-  ) {
+  let isEmpty: boolean;
+
+  if (typeof fieldConfig.required === 'function') {
+    isEmpty = fieldConfig.required({
+      formContext,
+      formFields,
+      formValues,
+    });
+  } else {
+    isEmpty =
+      fieldValue === undefined ||
+      fieldValue === null ||
+      fieldValue === '' ||
+      (Array.isArray(fieldValue) && !fieldValue.length);
+  }
+
+  if (isEmpty) {
     fieldErrors.push({
       type: 'required',
       message: fieldConfig.errorMessages?.required ?? 'The value is required',
@@ -469,7 +483,9 @@ export const createHoneyFormDateToValidator =
     return errorMsg;
   };
 
-export const BUILT_IN_FIELD_VALIDATORS = [requiredBuiltInFieldValidator];
+export const BUILT_IN_FIELD_VALIDATORS: HoneyFormFieldBuiltInValidator[] = [
+  requiredBuiltInFieldValidator,
+];
 
 export const BUILT_IN_INTERACTIVE_FIELD_VALIDATORS = [
   // number

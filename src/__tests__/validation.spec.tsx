@@ -457,6 +457,42 @@ describe('Hook [use-honey-form]: Validation', () => {
 
     expect(onSubmit).not.toHaveBeenCalled();
   });
+
+  it('should validate dynamically required fields based on form values during submission', async () => {
+    const onSubmit = jest.fn();
+
+    const { result } = renderHook(() =>
+      useHoneyForm<{ isAddNote: boolean; note: string }>({
+        fields: {
+          isAddNote: {
+            type: 'radio',
+          },
+          note: {
+            type: 'string',
+            required: ({ formValues }) => formValues.isAddNote,
+          },
+        },
+        onSubmit,
+      }),
+    );
+
+    await act(() => result.current.submitForm());
+
+    expect(result.current.formFields.note.errors).toStrictEqual([]);
+    onSubmit.mockReset();
+
+    act(() => result.current.formFields.isAddNote.setValue(true));
+    await act(() => result.current.submitForm());
+
+    expect(result.current.formFields.note.errors).toStrictEqual([
+      {
+        type: 'required',
+        message: 'The value is required',
+      },
+    ]);
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
 });
 
 describe('Hook [use-honey-form]: `onAfterValidate` callback function', () => {
