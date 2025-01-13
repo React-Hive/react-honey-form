@@ -100,23 +100,23 @@ export const requiredBuiltInFieldValidator: HoneyFormFieldBuiltInValidator = ({
     return;
   }
 
-  let isEmpty: boolean;
+  const isEmpty =
+    fieldValue === undefined ||
+    fieldValue === null ||
+    fieldValue === '' ||
+    (Array.isArray(fieldValue) && !fieldValue.length);
 
-  if (typeof fieldConfig.required === 'function') {
-    isEmpty = fieldConfig.required({
+  let isErred = isEmpty;
+
+  if (isEmpty && typeof fieldConfig.required === 'function') {
+    isErred = fieldConfig.required({
       formContext,
       formFields,
       formValues,
     });
-  } else {
-    isEmpty =
-      fieldValue === undefined ||
-      fieldValue === null ||
-      fieldValue === '' ||
-      (Array.isArray(fieldValue) && !fieldValue.length);
   }
 
-  if (isEmpty) {
+  if (isErred) {
     fieldErrors.push({
       type: 'required',
       message: fieldConfig.errorMessages?.required ?? 'The value is required',
