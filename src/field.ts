@@ -1383,7 +1383,7 @@ export const resetAllFields = <Form extends HoneyFormBaseForm, FormContext>(
  * @template FormContext - The type representing the context associated with the form.
  *
  * @param {FormContext} formContext - The type representing the context associated with the form.
- * @param {HoneyFormFields<Form, FormContext>} nextFormFields - The next form fields state.
+ * @param {HoneyFormFields<Form, FormContext>} formFields - The next form fields state.
  * @param {FieldName} fieldName - The name of the field triggering the resetting.
  * @param {Nullable<FieldName>} initiatorFieldName - The name of the field that initiated the resetting (optional).
  */
@@ -1393,18 +1393,18 @@ const resetDependentFields = <
   FormContext,
 >(
   formContext: FormContext,
-  nextFormFields: HoneyFormFields<Form, FormContext>,
+  formFields: HoneyFormFields<Form, FormContext>,
   fieldName: FieldName,
   initiatorFieldName: Nullable<FieldName> = null,
 ) => {
   initiatorFieldName = initiatorFieldName || fieldName;
 
-  forEachFormField(nextFormFields, otherFieldName => {
+  forEachFormField(formFields, otherFieldName => {
     if (otherFieldName === fieldName) {
       return;
     }
 
-    const { dependsOn } = nextFormFields[otherFieldName].config;
+    const { dependsOn } = formFields[otherFieldName].config;
 
     let isDependent: boolean;
 
@@ -1412,24 +1412,24 @@ const resetDependentFields = <
       isDependent = dependsOn.includes(fieldName);
       //
     } else if (typeof dependsOn === 'function') {
-      const formValues = getFormValues(nextFormFields);
+      const formValues = getFormValues(formFields);
 
-      isDependent = dependsOn(initiatorFieldName, nextFormFields[otherFieldName].cleanValue, {
+      isDependent = dependsOn(initiatorFieldName, formFields[otherFieldName].cleanValue, {
         formContext,
         formValues,
-        formFields: nextFormFields,
+        formFields,
       });
     } else {
       isDependent = fieldName === dependsOn;
     }
 
     if (isDependent) {
-      const otherField = nextFormFields[otherFieldName];
+      const otherField = formFields[otherFieldName];
 
-      nextFormFields[otherFieldName] = getNextResetField(otherField, false);
+      formFields[otherFieldName] = getNextResetField(otherField, false);
 
       if (otherFieldName !== initiatorFieldName) {
-        resetDependentFields(formContext, nextFormFields, otherFieldName, fieldName);
+        resetDependentFields(formContext, formFields, otherFieldName, fieldName);
       }
     }
   });
@@ -1711,22 +1711,20 @@ export const getNextFieldsState = <
     finishFieldAsyncValidation,
   }: NextFieldsStateOptions<ParentForm, ParentFieldName, Form, FieldName, FormContext>,
 ): HoneyFormFields<Form, FormContext> => {
-  const fieldConfig = formFields[fieldName].config;
-
   const nextFormFields = { ...formFields };
-  let nextFormField: HoneyFormField<Form, FieldName, FormContext> = formFields[fieldName];
 
+  let nextFormField = nextFormFields[fieldName];
   let filteredValue: Form[FieldName] = fieldValue;
 
-  if (checkIfHoneyFormFieldIsInteractive(fieldConfig)) {
+  if (checkIfHoneyFormFieldIsInteractive(nextFormField.config)) {
     filteredValue =
       typeof fieldValue === 'string'
         ? ((fieldValue as string).trimStart() as Form[FieldName])
         : fieldValue;
 
-    if (fieldConfig.filter) {
+    if (nextFormField.config.filter) {
       // Apply additional filtering to the field value when the filter function is defined
-      filteredValue = fieldConfig.filter(filteredValue, { formContext });
+      filteredValue = nextFormField.config.filter(filteredValue, { formContext });
     }
   }
 

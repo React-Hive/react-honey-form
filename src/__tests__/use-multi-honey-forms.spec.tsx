@@ -201,17 +201,14 @@ describe('Hook [use-multi-honey-forms]: General', () => {
       }),
     );
 
-    // Add a form
     act(() => {
       multiFormsApi.current.addForm(formApi.current);
     });
 
     unmount();
 
-    // Set a value for the name field
     act(() => formApi.current.formFields.name.setValue('Apple'));
 
-    // Submit all forms
     await act(() => multiFormsApi.current.submitForms());
 
     expect(onSubmit).toHaveBeenCalledWith(

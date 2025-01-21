@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react';
+import { StrictMode } from 'react';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import type { CustomDateRangeForm } from '../types';
@@ -282,7 +283,7 @@ describe('Hook [use-honey-form]: Validation', () => {
     ]);
   });
 
-  it('should call the field validator function once when the field value is set', () => {
+  it('should invoke the field validator function once when the field value is set', () => {
     const onValidate = jest.fn().mockReturnValue(true);
 
     const { result } = renderHook(() =>
@@ -299,6 +300,31 @@ describe('Hook [use-honey-form]: Validation', () => {
     act(() => result.current.formFields.name.setValue('Apple'));
 
     expect(onValidate.mock.calls.length).toBe(1);
+  });
+
+  it('should invoke the field validator function every time the field value changes (with StrictMode)', () => {
+    const onValidate = jest.fn().mockReturnValue(true);
+
+    const { result } = renderHook(
+      () =>
+        useHoneyForm<{ name: string }>({
+          fields: {
+            name: {
+              type: 'string',
+              validator: onValidate,
+            },
+          },
+        }),
+      {
+        wrapper: StrictMode,
+      },
+    );
+
+    act(() => result.current.formFields.name.setValue('A'));
+    act(() => result.current.formFields.name.setValue('Ap'));
+    act(() => result.current.formFields.name.setValue('App'));
+
+    expect(onValidate.mock.calls.length).toBe(3);
   });
 
   it('should handle multiple field validators affecting each other', async () => {

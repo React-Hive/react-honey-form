@@ -12,7 +12,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # https://github.com/actions/node-versions/releases
+          node-version: 22.13.0
           registry-url: https://registry.npmjs.org/
 
       - run: npm install
