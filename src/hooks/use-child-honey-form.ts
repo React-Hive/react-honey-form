@@ -10,12 +10,7 @@ import type {
   InitialFormFieldsStateResolverOptions,
   KeysWithArrayValues,
 } from '../types';
-import {
-  getHoneyFormUniqueId,
-  registerChildForm,
-  mapFieldsConfig,
-  unregisterChildForm,
-} from '../helpers';
+import { registerChildForm, mapFieldsConfig, unregisterChildForm } from '../helpers';
 
 import { useBaseHoneyForm } from './use-base-honey-form';
 import { createField } from '../field';
@@ -115,12 +110,7 @@ export const useChildHoneyForm = <
   ChildForm,
   FormContext
 > => {
-  const { formIdRef, formFieldsRef, ...childFormApi } = useBaseHoneyForm<
-    ParentForm,
-    ParentFieldName,
-    ChildForm,
-    FormContext
-  >({
+  const childFormApi = useBaseHoneyForm<ParentForm, ParentFieldName, ChildForm, FormContext>({
     parentField,
     fieldsConfig,
     initialFormFieldsStateResolver: config =>
@@ -134,24 +124,22 @@ export const useChildHoneyForm = <
     ...options,
   });
 
-  const { submitForm, setFormValues, validateForm } = childFormApi;
+  const { formId, formFieldsRef, submitForm, setFormValues, validateForm } = childFormApi;
 
   useEffect(() => {
     if (parentField) {
-      formIdRef.current = getHoneyFormUniqueId();
-
       registerChildForm(parentField, {
+        formId,
         formFieldsRef,
         submitForm,
         validateForm,
         setFormValues,
-        formId: formIdRef.current,
       });
     }
 
     return () => {
-      if (parentField && formIdRef.current) {
-        unregisterChildForm(parentField, formIdRef.current);
+      if (parentField) {
+        unregisterChildForm(parentField, formId);
       }
     };
   }, []);

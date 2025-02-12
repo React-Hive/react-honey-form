@@ -1525,7 +1525,7 @@ export type FormOptions<
    * The debounce time in milliseconds for the `onChange` callback.
    * This sets a delay before the callback is invoked after any form field value change.
    *
-   * @default 0
+   * @default undefined
    */
   onChangeDebounce?: number;
 };

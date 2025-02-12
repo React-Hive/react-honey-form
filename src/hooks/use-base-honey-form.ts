@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type {
   Nullable,
   FormOptions,
-  HoneyFormId,
   HoneyFormBaseForm,
   HoneyFormFieldAddError,
   HoneyFormFieldClearErrors,
@@ -85,8 +84,10 @@ export const useBaseHoneyForm = <
   onAfterValidate,
   onSubmit,
   onChange,
-  onChangeDebounce = 0,
+  onChangeDebounce,
 }: FormOptions<ParentForm, ParentFieldName, Form, FormContext>) => {
+  const formId = useId();
+
   const [formState, setFormState] = useState<HoneyFormState>(INITIAL_FORM_STATE);
 
   const [isFormDefaultsFetching, setIsFormDefaultsFetching] = useState(false);
@@ -104,7 +105,6 @@ export const useBaseHoneyForm = <
   });
 
   const formDefaultsRef = useRef<HoneyFormDefaultValues<Form>>(formDefaults);
-  const formIdRef = useRef<Nullable<HoneyFormId>>(null);
   const formContextRef = useRef<FormContext>(formContext);
   formContextRef.current = formContext;
 
@@ -146,10 +146,6 @@ export const useBaseHoneyForm = <
       return fn();
     }
 
-    if (onChangeFormTimeoutIdRef.current) {
-      clearTimeout(onChangeFormTimeoutIdRef.current);
-    }
-
     const nextFormFields = fn();
 
     if (!parentField) {
@@ -162,13 +158,7 @@ export const useBaseHoneyForm = <
 
     // If `onChange` is provided, set a timeout for debouncing and call `onChange` after the timeout.
     if (onChange) {
-      const debounceTime = initiatorFieldName
-        ? (formFieldsRef.current[initiatorFieldName].config.onChangeDebounce ?? onChangeDebounce)
-        : onChangeDebounce;
-
-      onChangeFormTimeoutIdRef.current = window.setTimeout(() => {
-        onChangeFormTimeoutIdRef.current = null;
-
+      const initiateOnChange = () => {
         const formFields = formFieldsRef.current;
         if (!formFields) {
           throw new Error(HONEY_FORM_ERRORS.emptyFormFieldsRef);
@@ -189,7 +179,25 @@ export const useBaseHoneyForm = <
           formErrors,
           formContext: formContextRef.current,
         });
-      }, debounceTime);
+      };
+
+      const debounceTime = initiatorFieldName
+        ? (formFieldsRef.current[initiatorFieldName].config.onChangeDebounce ?? onChangeDebounce)
+        : onChangeDebounce;
+
+      if (debounceTime) {
+        if (onChangeFormTimeoutIdRef.current) {
+          clearTimeout(onChangeFormTimeoutIdRef.current);
+        }
+
+        onChangeFormTimeoutIdRef.current = window.setTimeout(() => {
+          onChangeFormTimeoutIdRef.current = null;
+
+          initiateOnChange();
+        }, debounceTime);
+      } else {
+        initiateOnChange();
+      }
     }
 
     return nextFormFields;
@@ -351,13 +359,13 @@ export const useBaseHoneyForm = <
 
       const fieldConfig = nextFormFields[fieldName].config;
 
-      // if (checkIfFieldIsNestedForms(fieldConfig)) {
-      //   formField.__meta__.childForms?.forEach((childForm, childFormIndex) => {
-      //     childForm.setFormValues(fieldValue?.[childFormIndex] ?? {}, {
-      //       isValidate: isRevalidate,
-      //     });
-      //   });
-      // }
+      if (checkIfFieldIsNestedForms(fieldConfig)) {
+        formField.__meta__.childForms?.forEach((childForm, childFormIndex) => {
+          childForm.setFormValues(fieldValue?.[childFormIndex] ?? {}, {
+            isValidate: isRevalidate,
+          });
+        });
+      }
 
       if (fieldConfig.onChange) {
         onChangeFieldsTimeoutIdRef.current[fieldName] = window.setTimeout(() => {
@@ -816,7 +824,7 @@ export const useBaseHoneyForm = <
     !formState.isSubmitting;
 
   return {
-    formIdRef,
+    formId,
     formContext,
     formFieldsRef,
     // Getters are needed to get the form fields, values and etc. using multi forms

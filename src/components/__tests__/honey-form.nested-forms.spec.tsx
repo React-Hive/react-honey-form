@@ -1,7 +1,12 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render, fireEvent, waitFor, act } from '@testing-library/react';
 
-import type { ChildHoneyFormFieldsConfig, HoneyFormFieldsConfig } from '../../types';
+import type {
+  ChildHoneyFormFieldsConfig,
+  HoneyFormFields,
+  HoneyFormFieldsConfig,
+  Nullable,
+} from '../../types';
 
 import { HoneyForm } from '../honey-form';
 import { useHoneyFormProvider } from '../honey-form.provider';
@@ -592,42 +597,40 @@ describe('Component [HoneyForm]: Nested forms', () => {
       },
     };
 
+    let formFieldsRef: Nullable<HoneyFormFields<ItemsForm>> = null;
+
     const { getByTestId, queryByTestId } = render(
       <HoneyForm fields={fields} onSubmit={onSubmit}>
-        {({ formFields }) => (
-          <>
-            {formFields.items.value.map((itemForm, itemFormIndex) => (
-              <ItemLineForm key={itemForm.id} formIndex={itemFormIndex} />
-            ))}
+        {({ formFields }) => {
+          formFieldsRef = formFields;
 
-            <button
-              type="button"
-              data-testid="addItems"
-              onClick={() =>
-                formFields.items.setValue([
-                  {
-                    id: getNextChildFormId(),
-                    name: 'Apple',
-                  },
-                  {
-                    id: getNextChildFormId(),
-                    name: 'Banana',
-                  },
-                ])
-              }
-            >
-              Add Items
-            </button>
+          return (
+            <>
+              {formFields.items.value.map((itemForm, itemFormIndex) => (
+                <ItemLineForm key={itemForm.id} formIndex={itemFormIndex} />
+              ))}
 
-            <button type="submit" data-testid="save">
-              Save
-            </button>
-          </>
-        )}
+              <button type="submit" data-testid="save">
+                Save
+              </button>
+            </>
+          );
+        }}
       </HoneyForm>,
     );
 
-    fireEvent.click(getByTestId('addItems'));
+    act(() =>
+      formFieldsRef?.items.setValue([
+        {
+          id: getNextChildFormId(),
+          name: 'Apple',
+        },
+        {
+          id: getNextChildFormId(),
+          name: 'Banana',
+        },
+      ]),
+    );
 
     expect(queryByTestId('item[0].name')).not.toBeNull();
     expect(queryByTestId('item[1].name')).not.toBeNull();
@@ -641,6 +644,39 @@ describe('Component [HoneyForm]: Nested forms', () => {
             {
               id: '1',
               name: 'Apple',
+            },
+            {
+              id: '2',
+              name: 'Banana',
+            },
+          ],
+        },
+        { context: undefined },
+      ),
+    );
+
+    act(() =>
+      formFieldsRef?.items.setValue([
+        {
+          id: '1',
+          name: 'Pear',
+        },
+        {
+          id: '2',
+          name: 'Banana',
+        },
+      ]),
+    );
+
+    fireEvent.click(getByTestId('save'));
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        {
+          items: [
+            {
+              id: '1',
+              name: 'Pear',
             },
             {
               id: '2',
