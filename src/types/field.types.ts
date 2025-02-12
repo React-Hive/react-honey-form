@@ -143,6 +143,17 @@ type HoneyFormFieldSetValueOptionsInternal = HoneyFormFieldSetValueOptions & {
    * @default false
    */
   isPushValue?: boolean;
+  /**
+   * Indicates whether the values for nested child forms should be set when setting the value for a parent form field.
+   *
+   * If `true`, the corresponding values for child forms are also updated when the parent field value changes.
+   * This is useful for fields representing nested forms or structures that contain child forms.
+   *
+   * If `false`, the child form values are not modified.
+   *
+   * @default true
+   */
+  isSetChildFormsValues?: boolean;
 };
 
 /**

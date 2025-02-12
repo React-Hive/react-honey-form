@@ -203,6 +203,36 @@ export const useBaseHoneyForm = <
     return nextFormFields;
   };
 
+  const formFieldChangeProcessor = (
+    fieldName: keyof Form,
+    fn: () => HoneyFormFields<Form, FormContext>,
+  ) => {
+    if (onChangeFieldsTimeoutIdRef.current[fieldName]) {
+      clearTimeout(onChangeFieldsTimeoutIdRef.current[fieldName]);
+    }
+
+    const nextFormFields = fn();
+
+    const fieldConfig = nextFormFields[fieldName].config;
+
+    if (fieldConfig.onChange) {
+      onChangeFieldsTimeoutIdRef.current[fieldName] = window.setTimeout(() => {
+        onChangeFieldsTimeoutIdRef.current[fieldName] = null;
+
+        const cleanValue = checkIfFieldIsNestedForms(fieldConfig)
+          ? (nextFormFields[fieldName].getChildFormsValues() as Form[typeof fieldName])
+          : nextFormFields[fieldName].cleanValue;
+
+        fieldConfig.onChange(cleanValue, {
+          formContext,
+          formFields: nextFormFields,
+        });
+      }, fieldConfig.onChangeDebounce ?? 0);
+    }
+
+    return nextFormFields;
+  };
+
   const setFormValues = useCallback<HoneyFormSetFormValues<Form>>(
     (
       values,
@@ -311,7 +341,13 @@ export const useBaseHoneyForm = <
   const setFieldValue: HoneyFormFieldSetValueInternal<Form> = (
     fieldName,
     fieldValue,
-    { isValidate = true, isDirty = true, isFormat = true, isPushValue = false } = {},
+    {
+      isValidate = true,
+      isDirty = true,
+      isFormat = true,
+      isPushValue = false,
+      isSetChildFormsValues = true,
+    } = {},
   ) => {
     // Any new field value clears the next form states
     isFormValidRef.current = false;
@@ -323,65 +359,54 @@ export const useBaseHoneyForm = <
 
     const nextFormFields = formChangeProcessor(fieldName, () => {
       const formFields = formFieldsRef.current;
-
-      if (onChangeFieldsTimeoutIdRef.current[fieldName]) {
-        clearTimeout(onChangeFieldsTimeoutIdRef.current[fieldName]);
-      }
-
       const formField = formFields[fieldName];
 
       const isFieldErred = formField.errors.length > 0;
       const isRevalidate = isValidate || isFieldErred;
 
-      const nextFormFields = getNextFieldsState(
-        fieldName,
-        // @ts-expect-error
-        isPushValue ? [...formField.value, fieldValue] : fieldValue,
-        {
-          parentField,
-          formContext,
-          formFields,
-          isFormat,
-          finishFieldAsyncValidation,
-          // Re-validate the field immediately if it previously had errors or if forced to validate
-          isValidate: isRevalidate,
-        },
-      );
-
-      if (parentField) {
-        if (alwaysValidateParentField || isFieldErred || nextFormFields[fieldName].errors.length) {
-          // Use a timeout to avoid rendering the parent form during this field's render cycle
-          setTimeout(() => {
-            parentField.validate();
-          }, 0);
-        }
-      }
-
-      const fieldConfig = nextFormFields[fieldName].config;
-
-      if (checkIfFieldIsNestedForms(fieldConfig)) {
-        formField.__meta__.childForms?.forEach((childForm, childFormIndex) => {
-          childForm.setFormValues(fieldValue?.[childFormIndex] ?? {}, {
-            isValidate: isRevalidate,
-          });
-        });
-      }
-
-      if (fieldConfig.onChange) {
-        onChangeFieldsTimeoutIdRef.current[fieldName] = window.setTimeout(() => {
-          onChangeFieldsTimeoutIdRef.current[fieldName] = null;
-
-          const cleanValue = checkIfFieldIsNestedForms(fieldConfig)
-            ? (nextFormFields[fieldName].getChildFormsValues() as Form[typeof fieldName])
-            : nextFormFields[fieldName].cleanValue;
-
-          fieldConfig.onChange(cleanValue, {
+      return formFieldChangeProcessor(fieldName, () => {
+        const nextFormFields = getNextFieldsState(
+          fieldName,
+          // @ts-expect-error
+          isPushValue ? [...formField.value, fieldValue] : fieldValue,
+          {
+            parentField,
             formContext,
-            formFields: nextFormFields,
-          });
-        }, fieldConfig.onChangeDebounce ?? 0);
-      }
-      return nextFormFields;
+            formFields,
+            isFormat,
+            finishFieldAsyncValidation,
+            // Re-validate the field immediately if it previously had errors or if forced to validate
+            isValidate: isRevalidate,
+          },
+        );
+
+        if (parentField) {
+          if (
+            alwaysValidateParentField ||
+            isFieldErred ||
+            nextFormFields[fieldName].errors.length
+          ) {
+            // Use a timeout to avoid rendering the parent form during this field's render cycle
+            setTimeout(() => {
+              parentField.validate();
+            }, 0);
+          }
+        }
+
+        if (isSetChildFormsValues) {
+          const fieldConfig = nextFormFields[fieldName].config;
+
+          if (checkIfFieldIsNestedForms(fieldConfig)) {
+            formField.__meta__.childForms?.forEach((childForm, childFormIndex) => {
+              childForm.setFormValues(fieldValue?.[childFormIndex] ?? {}, {
+                isValidate: isRevalidate,
+              });
+            });
+          }
+        }
+
+        return nextFormFields;
+      });
     });
 
     formFieldsRef.current = nextFormFields;
@@ -421,6 +446,9 @@ export const useBaseHoneyForm = <
       formField
         .getChildFormsValues()
         .filter((_, index) => index !== formIndex) as Form[typeof fieldName],
+      {
+        isSetChildFormsValues: false,
+      },
     );
   };
 

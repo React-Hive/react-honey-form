@@ -15,13 +15,13 @@ import type {
   HoneyFormValidate,
 } from './types';
 import type { HoneyFormFieldAddError, HoneyFormFieldAddErrors } from './field.types';
-import type { HoneyFormBaseForm, HoneyFormValues } from './common.types';
+import type { HoneyFormBaseForm, HoneyFormId, HoneyFormValues } from './common.types';
 
 export type HoneyFormApi<Form extends HoneyFormBaseForm, FormContext = undefined> = {
   /**
    * Form ID.
    */
-  formId: string;
+  formId: HoneyFormId;
   /**
    * Reference to form fields.
    */
