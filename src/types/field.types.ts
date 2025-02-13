@@ -135,15 +135,6 @@ export type HoneyFormFieldSetValueOptions = {
  */
 type HoneyFormFieldSetValueOptionsInternal = HoneyFormFieldSetValueOptions & {
   /**
-   * Determines whether the new value should be appended to an existing array of values for the field.
-   *
-   * If `true`, the new value is added to the existing array (used for fields handling multiple values, such as array fields).
-   * If `false`, the new value replaces the current value.
-   *
-   * @default false
-   */
-  isPushValue?: boolean;
-  /**
    * Indicates whether the values for nested child forms should be set when setting the value for a parent form field.
    *
    * If `true`, the corresponding values for child forms are also updated when the parent field value changes.

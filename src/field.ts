@@ -530,7 +530,7 @@ export const createField = <
     validate: () => validateField(fieldName),
     focus: () => {
       if (!formFieldRef.current) {
-        throw new Error('[honey-form]: The `formFieldRef` value is null');
+        throw new Error(HONEY_FORM_ERRORS.emptyFormFieldsRef);
       }
 
       formFieldRef.current.focus();

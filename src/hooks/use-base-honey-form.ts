@@ -341,13 +341,7 @@ export const useBaseHoneyForm = <
   const setFieldValue: HoneyFormFieldSetValueInternal<Form> = (
     fieldName,
     fieldValue,
-    {
-      isValidate = true,
-      isDirty = true,
-      isFormat = true,
-      isPushValue = false,
-      isSetChildFormsValues = true,
-    } = {},
+    { isValidate = true, isDirty = true, isFormat = true, isSetChildFormsValues = true } = {},
   ) => {
     // Any new field value clears the next form states
     isFormValidRef.current = false;
@@ -365,20 +359,15 @@ export const useBaseHoneyForm = <
       const isRevalidate = isValidate || isFieldErred;
 
       return formFieldChangeProcessor(fieldName, () => {
-        const nextFormFields = getNextFieldsState(
-          fieldName,
-          // @ts-expect-error
-          isPushValue ? [...formField.value, fieldValue] : fieldValue,
-          {
-            parentField,
-            formContext,
-            formFields,
-            isFormat,
-            finishFieldAsyncValidation,
-            // Re-validate the field immediately if it previously had errors or if forced to validate
-            isValidate: isRevalidate,
-          },
-        );
+        const nextFormFields = getNextFieldsState(fieldName, fieldValue, {
+          parentField,
+          formContext,
+          formFields,
+          isFormat,
+          finishFieldAsyncValidation,
+          // Re-validate the field immediately if it previously had errors or if forced to validate
+          isValidate: isRevalidate,
+        });
 
         if (parentField) {
           if (
@@ -397,11 +386,28 @@ export const useBaseHoneyForm = <
           const fieldConfig = nextFormFields[fieldName].config;
 
           if (checkIfFieldIsNestedForms(fieldConfig)) {
-            formField.__meta__.childForms?.forEach((childForm, childFormIndex) => {
-              childForm.setFormValues(fieldValue?.[childFormIndex] ?? {}, {
-                isValidate: isRevalidate,
+            const childForms = formField.__meta__.childForms ?? [];
+
+            if (childForms.length) {
+              if (!Array.isArray(fieldValue)) {
+                throw new Error(
+                  '[honey-form]: Expected `fieldValue` to be an array when setting values for child forms. Received type: ' +
+                    typeof fieldValue,
+                );
+              }
+
+              if (childForms.length !== fieldValue.length) {
+                throw new Error(
+                  `[honey-form]: Mismatched length. The number of child forms (${childForms.length}) must match the length of \`fieldValue\` (${fieldValue.length}).`,
+                );
+              }
+
+              childForms.forEach((childForm, childFormIndex) => {
+                childForm.setFormValues(fieldValue[childFormIndex], {
+                  isValidate: isRevalidate,
+                });
               });
-            });
+            }
           }
         }
 
@@ -426,8 +432,18 @@ export const useBaseHoneyForm = <
   };
 
   const pushFieldValue: HoneyFormFieldPushValue<Form> = (fieldName, value) => {
-    // @ts-expect-error
-    setFieldValue(fieldName, value, { isPushValue: true });
+    const formFields = formFieldsRef.current;
+    if (!formFields) {
+      throw new Error(HONEY_FORM_ERRORS.emptyFormFieldsRef);
+    }
+
+    setFieldValue(
+      fieldName,
+      [...(formFields[fieldName].value as []), value] as Form[typeof fieldName],
+      {
+        isSetChildFormsValues: false,
+      },
+    );
   };
 
   /**
@@ -439,17 +455,13 @@ export const useBaseHoneyForm = <
       throw new Error(HONEY_FORM_ERRORS.emptyFormFieldsRef);
     }
 
-    const formField = formFields[fieldName];
+    const fieldValue = formFields[fieldName]
+      .getChildFormsValues()
+      .filter((_, index) => index !== formIndex) as Form[typeof fieldName];
 
-    setFieldValue(
-      fieldName,
-      formField
-        .getChildFormsValues()
-        .filter((_, index) => index !== formIndex) as Form[typeof fieldName],
-      {
-        isSetChildFormsValues: false,
-      },
-    );
+    setFieldValue(fieldName, fieldValue, {
+      isSetChildFormsValues: false,
+    });
   };
 
   const validateField: HoneyFormValidateField<Form> = fieldName => {
